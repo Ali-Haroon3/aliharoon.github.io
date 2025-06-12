@@ -92,8 +92,8 @@ a.nav-link{
 	justify-content: space-evenly;
 }
 
-/* #home .filter{
-	background: url('attached_assets/D04C6447-C2F2-4B01-BB5E-FB4E9CB28870_1_105_c_1749513753164.jpeg') no-repeat;
+#home .filter{
+	background: url('attached_assets/image_1749513746447.png') no-repeat;
 	background-size: cover;
 	background-position:center;
     position: absolute;
@@ -102,7 +102,7 @@ a.nav-link{
     left: 0;
     right: 0;
 	opacity:.20;
-}   */
+}  
 
 .intro {
 	text-align:center;
