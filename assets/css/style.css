@@ -286,6 +286,33 @@ h6 {
   border-bottom: 3px solid #149ddd;
 }
 
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-hero {
+  background: #149ddd;
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+  background: #37b3ed;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-hero-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
 @media (min-width: 1024px) {
   #hero {
     background-attachment: fixed;
@@ -794,6 +821,10 @@ section {
 
 .portfolio .medprep-bg {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.portfolio .polymarket-bg {
+  background: linear-gradient(135deg, #0f766e 0%, #22d3ee 100%);
 }
 
 .portfolio .placeholder-content {
@@ -1345,6 +1376,44 @@ section {
 
 .contact .php-email-form button[type=submit]:hover {
   background: #37b3ed;
+}
+
+.contact-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.contact-btn {
+  border: 0;
+  background: #149ddd;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: #37b3ed;
+  color: #fff;
+}
+
+.contact-btn-secondary {
+  background: #eef7ff;
+  color: #173b6c;
+}
+
+.contact-link-list {
+  margin-top: 18px;
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.contact-link-list li {
+  margin-bottom: 10px;
 }
 
 @keyframes animate-loading {

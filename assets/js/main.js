@@ -259,4 +259,21 @@
    */
   new PureCounter();
 
+  /**
+   * Copy email helper
+   */
+  const copyEmailBtn = select('#copy-email-btn')
+  if (copyEmailBtn) {
+    on('click', '#copy-email-btn', async function() {
+      const email = this.getAttribute('data-email')
+      if (!email) return
+      await navigator.clipboard.writeText(email)
+      const originalText = this.textContent
+      this.textContent = 'Copied!'
+      setTimeout(() => {
+        this.textContent = originalText
+      }, 1500)
+    })
+  }
+
 })()
