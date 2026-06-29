@@ -65,9 +65,11 @@
    * Scrolls to an element with header offset
    */
   const scrollto = (el) => {
+    let nav = select('#topnav')
+    let offset = nav ? nav.offsetHeight : 0
     let elementPos = select(el).offsetTop
     window.scrollTo({
-      top: elementPos,
+      top: elementPos - offset,
       behavior: 'smooth'
     })
   }
@@ -247,10 +249,11 @@
    */
   window.addEventListener('load', () => {
     AOS.init({
-      duration: 1000,
-      easing: 'ease-in-out',
+      duration: 650,
+      easing: 'ease-out-cubic',
       once: true,
-      mirror: false
+      mirror: false,
+      offset: 60
     })
   });
 
@@ -276,4 +279,90 @@
     })
   }
 
+})()
+
+/**
+ * 3D depth layer — scroll reveals, pointer-tilt project cards, hero parallax.
+ * Self-contained; gated by IntersectionObserver / fine-pointer / reduced-motion.
+ */
+;(function () {
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // Scroll reveals (rotateX rise). Hidden state is scoped to .js-reveal so
+  // the page stays fully visible if JS or IntersectionObserver is unavailable.
+  const revealEls = document.querySelectorAll('[data-reveal]')
+  if (revealEls.length && 'IntersectionObserver' in window && !reduce) {
+    document.documentElement.classList.add('js-reveal')
+    revealEls.forEach((el, i) => el.style.setProperty('--reveal-delay', (i % 3) * 0.09 + 's'))
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view')
+          io.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' })
+    revealEls.forEach((el) => io.observe(el))
+  }
+
+  // Pointer effects only on real mice, never under reduced motion.
+  if (!fine || reduce) return
+
+  // Pointer-tilt + cursor sheen on project cards
+  const MAX = 7
+  document.querySelectorAll('.portfolio-wrap[data-tilt]').forEach((card) => {
+    let raf = null
+    let rect = null
+    const refresh = () => { rect = card.getBoundingClientRect() }
+    card.addEventListener('pointerenter', refresh)
+    card.addEventListener('pointermove', (e) => {
+      if (!rect) refresh()
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = null
+        const px = (e.clientX - rect.left) / rect.width
+        const py = (e.clientY - rect.top) / rect.height
+        card.style.setProperty('--ry', ((px - 0.5) * 2 * MAX).toFixed(2) + 'deg')
+        card.style.setProperty('--rx', ((0.5 - py) * 2 * MAX).toFixed(2) + 'deg')
+        card.style.setProperty('--mx', (px * 100).toFixed(1) + '%')
+        card.style.setProperty('--my', (py * 100).toFixed(1) + '%')
+      })
+    })
+    card.addEventListener('pointerleave', () => {
+      rect = null
+      card.style.setProperty('--rx', '0deg')
+      card.style.setProperty('--ry', '0deg')
+    })
+  })
+
+  // Hero mouse parallax: name/text float against the photo
+  const hero = document.getElementById('hero')
+  if (hero) {
+    let hraf = null
+    hero.addEventListener('pointermove', (e) => {
+      if (hraf) return
+      hraf = requestAnimationFrame(() => {
+        hraf = null
+        const r = hero.getBoundingClientRect()
+        hero.style.setProperty('--px', ((e.clientX - r.left) / r.width - 0.5).toFixed(3))
+        hero.style.setProperty('--py', ((e.clientY - r.top) / r.height - 0.5).toFixed(3))
+      })
+    })
+    hero.addEventListener('pointerleave', () => {
+      hero.style.setProperty('--px', '0')
+      hero.style.setProperty('--py', '0')
+    })
+  }
+})()
+
+/**
+ * Top-nav glass-on-scroll state
+ */
+;(function () {
+  const nav = document.getElementById('topnav')
+  if (!nav) return
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24)
+  onScroll()
+  window.addEventListener('scroll', onScroll, { passive: true })
 })()
