@@ -2169,6 +2169,13 @@ section { padding: 108px 0; overflow: clip; }
 }
 .portfolio .blackjack-bg .portfolio-shot { object-position: center; }
 .portfolio .lung-cancer-bg .portfolio-shot { object-position: top center; }
+.portfolio .polymarket-bg .portfolio-shot,
+.portfolio .medprep-bg .portfolio-shot { object-position: center; filter: none; }
+/* lighter scrim for the dark data-viz cards so the chart stays visible */
+.portfolio .polymarket-bg.has-shot::after,
+.portfolio .medprep-bg.has-shot::after {
+  background: linear-gradient(180deg, rgba(8, 8, 12, 0.28) 0%, rgba(8, 8, 12, 0.40) 56%, rgba(8, 8, 12, 0.66) 100%);
+}
 .portfolio .portfolio-media.has-shot::after {
   content: "";
   position: absolute;
