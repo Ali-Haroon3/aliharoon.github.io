@@ -4,33 +4,58 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Ali Haroon's personal portfolio — a **static site** with no build step, deployed via **GitHub Pages** to the custom domain in `CNAME` (`www.ali-haroon.com`). Pushing to `main` publishes; there is nothing to compile, bundle, or transpile.
+Ali Haroon's personal portfolio — a **static site** with no build step, deployed via
+**GitHub Pages** to the custom domain in `CNAME` (`www.ali-haroon.com`). Pushing to
+`main` publishes; there is nothing to compile, bundle, or transpile.
 
-It is built on the BootstrapMade **iPortfolio** Bootstrap template (see the header comment in `assets/js/main.js`). Most of `assets/` is vendored, third-party template code.
+Two sites live here:
 
-## Commands
+- **Root (`index.html`, `styles.css`, `script.js`)** — the Fortnite-themed portfolio,
+  now the main site. Vanilla HTML/CSS/JS. It boots through CONNECTING → loading screen →
+  lobby, then an interactive Reload-island map where six POIs open resume panels.
+  The island image loads at runtime from the public `yaelbrinkert/fortnite-archives`
+  project (`latest/blastberry_latest.png`); an original hand-drawn SVG island is the
+  fallback. **Never commit Epic Games imagery, audio, or fonts into this repo**, and
+  keep the Epic fan-content disclaimer visible on the page. The canonical dev copy of
+  these three files lives in the `Ali-Haroon3/Ali-Moin-Haroon` repo under `fortnite/`;
+  keep the two in sync when editing (root copy points its Classic links at `/classic/`).
+- **`classic/`** — the previous BootstrapMade iPortfolio site, fully intact and served
+  at `/classic/`. Everything under it is self-contained (its `assets/`, `forms/`, and a
+  copy of the resume PDF moved with it). See the notes below before editing it.
+- **`fortnite/`** — just a meta-refresh redirect to `/` (the old URL of the Fortnite
+  site; keep it so shared links don't break).
 
-There are no build/lint/test tools. To preview locally, serve the repo root with any static server:
+`Ali_Haroon_Resume.pdf` and `resume.html` (a meta-refresh to the PDF) stay at the
+repo root. Keep the root PDF and `classic/Ali_Haroon_Resume.pdf` in sync.
+
+## Design rules for the Fortnite site (Ali's preferences)
+
+- No emojis in the UI — inline SVG icons only (sprite at the top of `index.html`).
+- No gradient blends — flat colors, hard-edged offset shadows, angled `clip-path`
+  corners, hard-stop stripes. Matches actual Fortnite UI.
+- Display font Anton (legal stand-in for Burbank; never embed pirated Burbank),
+  body font Inter. Palette pinned in `styles.css` `:root` — ocean `#103a8c` and grass
+  `#318218` sampled from the map; standard Fortnite rarity colors; CTA yellow; storm purple.
+- Copy is short, first-person, and plain — no winking meta-jokes.
+
+## Notes on the classic site (`classic/`)
+
+Built on the BootstrapMade iPortfolio template. `classic/index.html` is a one-page
+layout; the active stylesheet/script are `classic/assets/css/style.css` and
+`classic/assets/js/main.js` (a `# SPATIAL DARK OVERHAUL` block at the end of the CSS
+owns the current dark look; the hero is a three.js canvas in
+`classic/assets/js/hero3d.js`, gated behind WebGL + reduced-motion checks).
+`classic/style.css` and `classic/script.js` are orphaned pre-template files — editing
+them does nothing. Vendored libraries under `classic/assets/vendor/` are read-only.
+The contact form stub (`classic/forms/contact.php`) is non-functional; contact is the
+copy-email button.
+
+## Local preview
 
 ```bash
-python3 -m http.server 8000      # then open http://localhost:8000
+python3 -m http.server 8000    # repo root → http://localhost:8000/ (fortnite) and /classic/
 ```
 
-The repo also ships a Replit config (`.replit` + `.config/static-web-server.toml`) that runs `static-web-server` on port 80 with all caching disabled — that path is Replit-specific and not needed for normal local work.
-
-## Architecture
-
-- **`index.html` is the entire site.** It is a one-page layout; the navbar links (`#hero`, `#about`, `#resume`, `#portfolio`, `#contact`) are in-page anchors, and `assets/js/main.js` drives the scrollspy that highlights the active section. To change site content, edit the corresponding `<section>` in `index.html`.
-- **`portfolio-details.html`** and **`inner-page.html`** are secondary template pages (portfolio project detail view / generic inner page). `resume.html` is just a meta-refresh redirect to `/Ali_Haroon_Resume.pdf`.
-- **Active stylesheet/script:** every page links `assets/css/style.css` and loads `assets/js/main.js`. These are the files to edit.
-- **Design system (custom):** `assets/css/style.css` is the stock iPortfolio CSS retrofitted with a design system. A `:root` token block near the top defines the palette (`--accent` vermillion, `--bg`/`--paper*` warm neutrals, `--ink*`) and fonts (`--font-display` Bricolage Grotesque, `--font-body` IBM Plex Sans, `--font-mono` IBM Plex Mono). The template's hardcoded colors/fonts were globally replaced with these tokens, and an appended **`# UPGRADE LAYER`** block at the end of the file owns the hero poster treatment, motion (CSS hero entrance + tuned AOS), and micro-interactions. When restyling, change tokens or extend the UPGRADE LAYER — do **not** reintroduce the stock cyan (`#149ddd`) or generic fonts. Fonts load via the Google Fonts `<link>` in each page's `<head>`.
-- **3D / depth layer:** a `# 3D / DEPTH LAYER` block at the very end of `style.css` plus a second self-contained IIFE at the end of `main.js` add pointer-tilt project cards (`.portfolio-wrap[data-tilt]` inside a `.tilt-scene` perspective wrapper, depth via `translateZ` planes + cursor sheen), `rotateX` scroll reveals (`[data-reveal]` → `.in-view`, hidden state scoped to `.js-reveal` so no-JS stays visible), the mono `01 / SECTION` ribs (`.section-title[data-index]::before`), and hero mouse-parallax. All pointer motion is gated behind `matchMedia('(hover:hover) and (pointer:fine)')` + `prefers-reduced-motion`; touch/reduced-motion get flat, fully-functional cards. The project cards are flat (no hover-reveal overlay): `.portfolio-media-link` (whole tile is a real link) + always-visible `.portfolio-body` (desc, tech chips, labeled `.card-link` action buttons). The second IIFE in `main.js` **must** stay prefixed with `;` — the template's first IIFE has no trailing semicolon.
-- **Spatial-dark overhaul (current look):** the site was redesigned away from the iPortfolio sidebar into a **full-bleed dark** layout. A `# SPATIAL DARK OVERHAUL` block at the very end of `style.css` flips the `:root` tokens to a dark palette (so every var-based rule re-themes) and re-styles layout: the old fixed `#header` sidebar is `display:none` and replaced by a fixed **`#topnav`** (brand + `#navbar` links + social/CTA + `.mobile-nav-toggle`); `#main`'s `margin-left` is zeroed; surfaces (skills/portfolio/contact cards) become translucent "glass". Scrollspy still keys off `#navbar .scrollto`; the mobile menu still toggles `body.mobile-nav-active`. **The hero** is a `<canvas id="hero-canvas">` driven by **`assets/js/hero3d.js`** — an ES module (`<script type="module">`) that imports **three.js from the jsDelivr CDN** and renders an interactive point-field. It is gated by a WebGL probe + `prefers-reduced-motion` and wrapped in try/catch, so no-WebGL / reduced-motion / offline all fall back silently to the CSS hero (overlay gradient + `body::before` glow). Note: a **headless browser without a GPU cannot render the WebGL hero** — verify it in a real browser.
-- **Vendored libraries** live under `assets/vendor/` (Bootstrap, AOS, typed.js, isotope, swiper, glightbox, purecounter, boxicons, bootstrap-icons). Treat these as read-only — do not hand-edit; the page wires them up in `main.js`.
-
-### Gotchas specific to this repo
-
-- **`/style.css` and `/script.js` at the repo root are orphaned.** No HTML file references them (they predate the iPortfolio template). Editing them has no effect on the live site — change `assets/css/style.css` and `assets/js/main.js` instead.
-- **`assets/js/main.js` mixes template code with custom code.** The bulk is stock iPortfolio (scrollspy, mobile nav toggle, typed.js intro, isotope portfolio filtering, glightbox, swiper, AOS, purecounter). The custom additions are appended at the end — notably the **`#copy-email-btn` clipboard handler** (~line 265). Add new custom behavior there rather than mid-file.
-- **The contact section has no working form.** `forms/contact.php` is a non-functional template stub (requires the template's paid "PHP Email Form" library, which is absent — and GitHub Pages cannot run PHP regardless). Contact is handled client-side via the Copy Email button and social links.
-- **The resume PDF (`Ali_Haroon_Resume.pdf`) lives at the repo root** and is what `resume.html` and the resume links point to. A second copy exists under `attached_assets/` — keep the root one in sync when updating the resume.
+The Fortnite site accepts `?mapimg=<url>` to test the map from a local image when the
+network can't reach GitHub raw URLs (useful in sandboxes; headless browsers also can't
+render the classic hero's WebGL — check it in a real browser).
