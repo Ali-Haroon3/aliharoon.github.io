@@ -476,6 +476,7 @@
           <ul class="quest-list">
             <li><svg class="ico check"><use href="#i-check" /></svg> Designed and enhanced Spring Boot RESTful APIs serving a real-time transaction-monitoring platform <b class="xp">LIVE FINANCIAL DATA STREAMS</b></li>
             <li><svg class="ico check"><use href="#i-check" /></svg> Maintained data integrity across IBM DB2 databases backing production analytics <b class="xp">MISSION-CRITICAL</b></li>
+            <li><svg class="ico check"><use href="#i-check" /></svg> Built and tested real-time monitoring UI components with Storybook and Jest for a ground-up redesign of the web app <b class="xp">ANGULAR 19</b></li>
           </ul>
         </article>
 
@@ -487,6 +488,7 @@
           <p class="quest-meta">Remote (cronys.xyz) &bull; Mar 2026 – Present</p>
           <ul class="quest-list">
             <li><svg class="ico check"><use href="#i-check" /></svg> Co-founded an AI agent governance platform — FastAPI backend with RAG-based retrieval — evaluating and classifying agent actions in real time <b class="xp">$25K PRE-SEED</b></li>
+            <li><svg class="ico check"><use href="#i-check" /></svg> Built the platform end to end, owning backend architecture, retrieval, and the methodology for scoring agent behavior <b class="xp">TWO-PERSON TEAM</b></li>
             <li><svg class="ico check"><use href="#i-check" /></svg> Designed the policy engine and evaluation infrastructure for automated governance decisions <b class="xp">BUILT FOR AUDIT + SCALE</b></li>
           </ul>
         </article>
@@ -539,12 +541,45 @@
         <button class="panel-close" aria-label="Close"><svg class="ico"><use href="#i-x" /></svg></button>
       </header>
       <div class="panel-body loot-grid">
+        <article class="loot mythic">
+          <span class="rarity-pill">MYTHIC</span>
+          <h3>Matchbook</h3>
+          <p>Price&ndash;time priority limit order book and matching engine sustaining 15M+ ops/sec at 48ns median (210ns p99), via flat-array price levels, occupancy bitmaps, and pooled allocation on the hot path. The Nasdaq ITCH 5.0 feed handler replays 3M+ msgs/sec over a lock-free SPSC pipeline.</p>
+          <p class="loot-stack">C++20 &bull; CMake</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/matchbook" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot legendary">
+          <span class="rarity-pill">LEGENDARY</span>
+          <h3>Chairfill</h3>
+          <p>Dental staffing marketplace for the Denver metro. Offices post temp shifts, verified pros get them by SMS in cascading waves, and the first to accept wins &mdash; a race resolved with a Redis lock and tested under concurrency. Stripe Connect payouts, geofenced timesheets, and reliability scoring that decays on a 90-day half-life.</p>
+          <p class="loot-stack">FastAPI &bull; Postgres &bull; Redis &bull; React &bull; TypeScript &bull; Stripe Connect &bull; private repo</p>
+        </article>
+        <article class="loot legendary">
+          <span class="rarity-pill">LEGENDARY</span>
+          <h3>ATS Copilot</h3>
+          <p>Job-application copilot polling nine job boards across a 306-company watchlist, tailoring a one-page r&eacute;sum&eacute; to each posting with the Claude CLI and rendering it to PDF in headless Chromium. Tracks every application from applied to offer by reading my inbox. 671 tailored applications so far, and it stops at the submit button by design.</p>
+          <p class="loot-stack">Python &bull; Flask &bull; Playwright &bull; SQLite &bull; Microsoft Graph &bull; private repo</p>
+        </article>
         <article class="loot legendary">
           <span class="rarity-pill">LEGENDARY</span>
           <h3>Polymarket Weather Prediction</h3>
-          <p>Rust + Python pipeline processing 500K+ NOAA records into PostgreSQL; calibrated probability forecasts (0.87 Brier) with Bayesian inference and Monte Carlo risk modeling for prediction-market contracts.</p>
+          <p>Rust + Python pipeline processing 500K+ NOAA records into PostgreSQL; calibrated probability forecasts (0.079 Brier) with Bayesian inference and Monte Carlo risk modeling for prediction-market contracts.</p>
           <p class="loot-stack">Rust &bull; Python &bull; NumPy &bull; pandas &bull; PostgreSQL</p>
           <a class="panel-btn" href="https://github.com/Ali-Haroon3/Polymarket-Weather-Predictor" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot epic">
+          <span class="rarity-pill">EPIC</span>
+          <h3>Winfetti</h3>
+          <p>Server-authoritative rewards backend. Every coin is written by the server into an append-only Postgres ledger, and redemptions deduct atomically into a review queue before any real money moves. Signature-verified ad, offerwall and payment webhooks; tests prove no double-credit and no negative balance under concurrent load.</p>
+          <p class="loot-stack">FastAPI &bull; SQLAlchemy &bull; Postgres &bull; Redis &bull; Docker</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/Winfetti" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot epic">
+          <span class="rarity-pill">EPIC</span>
+          <h3>OpenFloor</h3>
+          <p>Site for OpenFloor, a multiplayer development environment for teams running several coding agents against one objective. The WebGL hero renders the product&rsquo;s real data model with no metaphor: each line is a file path, each box is a task&rsquo;s claim on it, and collisions fall out of interval intersection rather than being placed by hand.</p>
+          <p class="loot-stack">Three.js &bull; WebGL &bull; esbuild &bull; Cloudflare Pages Functions</p>
+          <a class="panel-btn gold" href="https://openfloor.ai" target="_blank" rel="noreferrer"><svg class="ico"><use href="#i-globe" /></svg> VISIT THE SITE</a>
         </article>
         <article class="loot epic">
           <span class="rarity-pill">EPIC</span>
@@ -554,12 +589,76 @@
           <a class="panel-btn gold" href="https://blackjacktrainings.com" target="_blank" rel="noreferrer"><svg class="ico"><use href="#i-play" /></svg> PLAY IT LIVE</a>
           <a class="panel-btn" href="https://github.com/Ali-Haroon3/AIBlackJackTrainer" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
         </article>
+        <article class="loot epic">
+          <span class="rarity-pill">EPIC</span>
+          <h3>Barakat Nutrition App</h3>
+          <p>Malnutrition screening app for field workers in Afghanistan, built with Gravity AI as my senior capstone &mdash; a production tool used outside the classroom. Ships with a React supervisor dashboard for reviewing screening results.</p>
+          <p class="loot-stack">Senior capstone &bull; React &bull; Vite &bull; Recharts</p>
+          <a class="panel-btn gold" href="https://barakatnutrition.com" target="_blank" rel="noreferrer"><svg class="ico"><use href="#i-globe" /></svg> VISIT THE SITE</a>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/BarakatDashboard" target="_blank" rel="noreferrer">DASHBOARD ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot rare">
+          <span class="rarity-pill">RARE</span>
+          <h3>MedPrep</h3>
+          <p>MCAT study app built on the SM-2 spaced-repetition algorithm. Keyboard-first review, a scored question bank, streaks and a review heatmap. All study data stays in the browser &mdash; nothing is sent to a server.</p>
+          <p class="loot-stack">React &bull; TypeScript &bull; Tailwind</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/MedPrep" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot rare">
+          <span class="rarity-pill">RARE</span>
+          <h3>LooksmaxAI</h3>
+          <p>iOS app that reads facial geometry with Apple&rsquo;s Vision framework and scores it across weighted categories. Computes real ratios &mdash; midface, facial width-to-height, canthal tilt, gonial angle &mdash; plus a golden-ratio grid drawn over the captured photo.</p>
+          <p class="loot-stack">Swift &bull; SwiftUI &bull; Apple Vision &bull; Swift Charts</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/LooksmaxAI" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
         <article class="loot rare">
           <span class="rarity-pill">RARE</span>
           <h3>Lung Cancer Detection CNN</h3>
           <p>Model inference app (ResNet50, DenseNet121) with a PostgreSQL backend for batch inference, audit logging, and model performance monitoring.</p>
           <p class="loot-stack">Python &bull; TensorFlow &bull; Streamlit &bull; PostgreSQL</p>
           <a class="panel-btn" href="https://github.com/Ali-Haroon3/Lung-Cancer-Detection" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot rare">
+          <span class="rarity-pill">RARE</span>
+          <h3>PageRank &amp; Infection Dynamics</h3>
+          <p>Research on how graph structure drives infection spread across random networks, and where centrality methods like PageRank help predict or intervene. Generates graphs, simulates diffusion, and scores intervention strategies with paired comparisons across graph families.</p>
+          <p class="loot-stack">Python &bull; NetworkX &bull; pandas</p>
+          <a class="panel-btn" href="https://github.com/sudarshand03/network-influence-intervention" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot uncommon">
+          <span class="rarity-pill">UNCOMMON</span>
+          <h3>BeatBuddy</h3>
+          <p>Shows your top Spotify tracks and artists over several time ranges, recommends new music, and fills a discover page with nearby shows from the artists you already listen to. Five-person team, deployed on an Azure VM.</p>
+          <p class="loot-stack">Node.js &bull; EJS &bull; PostgreSQL &bull; Docker &bull; Azure</p>
+          <a class="panel-btn" href="https://github.com/CSCI3308-Group-3-Music-Recommendations/Music-Recommendation-App" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot uncommon">
+          <span class="rarity-pill">UNCOMMON</span>
+          <h3>Harmonic-Diff</h3>
+          <p>Takes the &ldquo;derivative&rdquo; of a song &mdash; audio analysis with librosa over a scraped track, rendered back in a Flask UI.</p>
+          <p class="loot-stack">Python &bull; Flask &bull; librosa &bull; NumPy</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/Harmonic-Diff" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot uncommon">
+          <span class="rarity-pill">UNCOMMON</span>
+          <h3>This Site</h3>
+          <p>No build step, no framework, no dependencies. Hand-built SVG icon sprite, hard-edged flat UI, and an original hand-drawn island that takes over when the runtime map image can&rsquo;t load.</p>
+          <p class="loot-stack">HTML &bull; CSS &bull; JavaScript &bull; GitHub Pages</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/aliharoon.github.io" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot common">
+          <span class="rarity-pill">COMMON</span>
+          <h3>Setlistify</h3>
+          <p>Builds a playlist out of every concert you have been to. Early &mdash; landing and auth views so far.</p>
+          <p class="loot-stack">HTML &bull; EJS &bull; Bootstrap</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/Setlistify" target="_blank" rel="noreferrer">INSPECT ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
+        </article>
+        <article class="loot common">
+          <span class="rarity-pill">COMMON</span>
+          <h3>Coursework &amp; Club Work</h3>
+          <p>OpenGL scenes with custom lighting and shaders for CSCI 4229; a wildfire-information site proposed to the City of Lafayette; chapter websites for AKPsi Boulder and KTP Northwestern.</p>
+          <p class="loot-stack">C &bull; OpenGL &bull; Node &bull; Express</p>
+          <a class="panel-btn" href="https://github.com/Ali-Haroon3/CSCI4229Projects" target="_blank" rel="noreferrer">GRAPHICS ON GITHUB <svg class="ico"><use href="#i-out" /></svg></a>
         </article>
       </div>
     </section>
@@ -580,7 +679,10 @@
             <span class="inv legendary">C++</span>
             <span class="inv legendary">Java</span>
             <span class="inv legendary">Python</span>
+            <span class="inv legendary">C</span>
             <span class="inv legendary">C#</span>
+            <span class="inv legendary">Swift</span>
+            <span class="inv legendary">TypeScript</span>
             <span class="inv legendary">JavaScript</span>
             <span class="inv legendary">SQL</span>
           </div>
@@ -594,6 +696,7 @@
             <span class="inv epic">Reliability Engineering</span>
             <span class="inv epic">Horizontal Scaling</span>
             <span class="inv epic">Load &amp; Rate Limiting</span>
+            <span class="inv epic">Idempotency &amp; Concurrency Control</span>
           </div>
         </div>
         <div class="aisle">
@@ -604,6 +707,8 @@
             <span class="inv rare">AWS</span>
             <span class="inv rare">GCP</span>
             <span class="inv rare">Azure</span>
+            <span class="inv rare">Cloudflare</span>
+            <span class="inv rare">Redis</span>
             <span class="inv rare">Jenkins</span>
             <span class="inv rare">CI/CD</span>
             <span class="inv rare">Linux</span>
@@ -618,11 +723,28 @@
             <span class="inv uncommon">Spring Boot</span>
             <span class="inv uncommon">FastAPI</span>
             <span class="inv uncommon">Flask</span>
+            <span class="inv uncommon">Node.js</span>
             <span class="inv uncommon">React</span>
+            <span class="inv uncommon">Angular</span>
+            <span class="inv uncommon">SwiftUI</span>
+            <span class="inv uncommon">Vite / Tailwind</span>
+            <span class="inv uncommon">SQLAlchemy / Alembic</span>
             <span class="inv uncommon">RAG / Retrieval Systems</span>
             <span class="inv uncommon">Agent Orchestration</span>
             <span class="inv uncommon">TensorFlow</span>
             <span class="inv uncommon">PyTorch</span>
+          </div>
+        </div>
+        <div class="aisle">
+          <h3 class="aisle-name common-t">AISLE 5 &mdash; QUANTITATIVE &amp; MARKETS</h3>
+          <div class="inv-grid">
+            <span class="inv common">Bayesian Inference</span>
+            <span class="inv common">Monte Carlo Simulation</span>
+            <span class="inv common">Probability Calibration</span>
+            <span class="inv common">Market Microstructure</span>
+            <span class="inv common">pandas</span>
+            <span class="inv common">NumPy</span>
+            <span class="inv common">Prediction Markets (Polymarket &bull; Kalshi)</span>
           </div>
         </div>
       </div>

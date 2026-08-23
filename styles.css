@@ -468,6 +468,7 @@ body {
 .panel.animate > .panel-body > *:nth-child(3) { animation-delay: .16s; }
 .panel.animate > .panel-body > *:nth-child(4) { animation-delay: .24s; }
 .panel.animate > .panel-body > *:nth-child(5) { animation-delay: .32s; }
+.panel.animate > .panel-body > *:nth-child(n+6) { animation-delay: .4s; }
 @keyframes fn-rise {
   from { transform: translateY(18px) scale(.97); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
@@ -498,11 +499,12 @@ body {
   clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
   color: #1c1500; background: var(--gold);
 }
-.quest.mythic .rarity-pill { background: var(--mythic); color: #3a2b00; }
+.quest.mythic .rarity-pill, .loot.mythic .rarity-pill { background: var(--mythic); color: #3a2b00; }
 .quest.legendary .rarity-pill, .loot.legendary .rarity-pill { background: var(--legendary); color: #2b1300; }
 .quest.epic .rarity-pill, .loot.epic .rarity-pill { background: var(--epic); color: #2a0842; }
 .quest.rare .rarity-pill, .loot.rare .rarity-pill { background: var(--rare); color: #04263f; }
-.quest.uncommon .rarity-pill { background: var(--uncommon); color: #143001; }
+.quest.uncommon .rarity-pill, .loot.uncommon .rarity-pill { background: var(--uncommon); color: #143001; }
+.loot.common .rarity-pill { background: var(--common); color: #1e1e1e; }
 
 .xp-bar {
   position: relative; height: 22px; border-radius: 2px; overflow: hidden; margin-top: .8rem;
@@ -526,7 +528,10 @@ body {
 .loot:hover { transform: translateY(-4px); }
 .loot.legendary { border-color: var(--legendary); box-shadow: 5px 5px 0 rgba(234, 141, 35, .3); }
 .loot.epic { border-color: var(--epic); box-shadow: 5px 5px 0 rgba(195, 89, 255, .25); }
+.loot.mythic { border-color: var(--mythic); box-shadow: 5px 5px 0 rgba(251, 212, 68, .3); }
 .loot.rare { border-color: var(--rare); box-shadow: 5px 5px 0 rgba(65, 191, 255, .25); }
+.loot.uncommon { border-color: var(--uncommon); box-shadow: 5px 5px 0 rgba(135, 227, 57, .22); }
+.loot.common { border-color: var(--common); box-shadow: 5px 5px 0 rgba(177, 177, 177, .18); }
 .loot .rarity-pill { align-self: flex-start; }
 .loot h3 { margin: .1rem 0 0; font-size: 1.02rem; }
 .loot p { margin: 0; color: var(--muted); font-size: .88rem; }
@@ -553,6 +558,7 @@ body {
 .epic-t { color: var(--epic); }
 .rare-t { color: var(--rare); }
 .uncommon-t { color: var(--uncommon); }
+.common-t { color: var(--common); }
 
 .inv-grid { display: flex; flex-wrap: wrap; gap: .55rem; }
 .inv {
