@@ -296,6 +296,25 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+/* ---------- skill chip -> the project or role that used it ---------- */
+// each chip in Retail Row carries the panel and card id of the work it came from
+function jumpToCard(panelName, cardId) {
+  showPanel(panelName);
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.pinged').forEach((el) => el.classList.remove('pinged'));
+    card.scrollIntoView({ block: 'center', behavior: reducedMotion ? 'auto' : 'smooth' });
+    void card.offsetWidth; // restart the flash if the same card is picked twice
+    card.classList.add('pinged');
+    setTimeout(() => card.classList.remove('pinged'), 1500);
+  });
+}
+
+document.querySelectorAll('.inv[data-card]').forEach((chip) => {
+  chip.addEventListener('click', () => jumpToCard(chip.dataset.panel, chip.dataset.card));
+});
+
 /* ---------- chest (contact): hold-to-search like the in-game prompt ---------- */
 const chestBtn = document.getElementById('chestBtn');
 const chestLoot = document.querySelector('.chest-loot');
@@ -303,7 +322,7 @@ const ringFill = document.getElementById('ringFill');
 const HOLD_MS = 850;
 const RING_LEN = 100.5; // 2πr for r=16
 let holdTimer = null;
-let holdSource = null; // 'pointer' | 'key' — which input started the current hold
+let holdSource = null; // 'pointer' | 'key': which input started the current hold
 
 function contactOpen() {
   return openPanel && openPanel.dataset.panel === 'contact' && !chestBtn.classList.contains('open');
