@@ -44,7 +44,7 @@ body {
 
 .ico { width: 1.05em; height: 1.05em; vertical-align: -0.18em; }
 
-/* AH banner emblem — the site logo, reused across screens */
+/* AH banner emblem: the site logo, reused across screens */
 .brand-emblem { display: block; width: 56px; height: 56px; }
 .boot-brand { width: 88px; height: 88px; }
 .load-brand { width: 58px; height: 58px; margin-bottom: .5rem; }
@@ -186,7 +186,7 @@ body {
 .play-btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
 .play-btn:focus-visible, .lobby-classic:focus-visible, .slot:focus-visible,
 .panel-close:focus-visible, .panel-btn:focus-visible, .chest-btn:focus-visible,
-.spot:focus-visible, .victory-close:focus-visible {
+.spot:focus-visible, .victory-close:focus-visible, button.inv:focus-visible {
   outline: 3px solid var(--yellow); outline-offset: 3px;
 }
 
@@ -294,7 +294,7 @@ body {
 .spot-exit .spot-ring { background: var(--rare); }
 .spot-exit:hover .spot-ring, .spot-exit:focus-visible .spot-ring { background: #fff; box-shadow: 0 0 0 3px var(--rare); }
 .spot-exit .spot-tag { color: var(--rare); }
-/* on square/narrow screens the offshore island sits under the minimap — keep the
+/* on square/narrow screens the offshore island sits under the minimap; keep the
    ring but drop its label so the two don't collide */
 @media (max-aspect-ratio: 7 / 5) {
   .spot-exit .spot-name, .spot-exit .spot-tag { display: none; }
@@ -506,6 +506,8 @@ body {
 .quest.uncommon .rarity-pill, .loot.uncommon .rarity-pill { background: var(--uncommon); color: #143001; }
 .loot.common .rarity-pill { background: var(--common); color: #1e1e1e; }
 
+.quest .panel-btn { margin-top: .9rem; }
+
 .xp-bar {
   position: relative; height: 22px; border-radius: 2px; overflow: hidden; margin-top: .8rem;
   background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
@@ -567,12 +569,26 @@ body {
   transition: transform .12s ease;
 }
 .inv:hover { transform: translateY(-3px); }
+/* chips that link to the work they came from are buttons, not spans */
+button.inv { font: inherit; font-weight: 700; font-size: .88rem; color: inherit; cursor: pointer; }
+button.inv:hover { border-color: var(--yellow); }
 .inv.legendary { border-color: var(--legendary); color: #ffc994; }
 .inv.epic { border-color: var(--epic); color: #e5bcff; }
 .inv.rare { border-color: var(--rare); color: #b9e4ff; }
 .inv.uncommon { border-color: var(--uncommon); color: #d0f5ac; }
 .inv.common { border-color: var(--common); color: #e3e3e3; }
-.inv-note { color: var(--muted); font-size: .8rem; margin: .4rem 0 0; }
+.inv-note { color: var(--muted); font-size: .8rem; margin: 0; }
+
+/* the card a skill chip points at flashes once when you land on it */
+.quest.pinged, .loot.pinged { animation: fn-ping 1.4s ease-out both; }
+@keyframes fn-ping {
+  0% { outline: 3px solid var(--yellow); outline-offset: 8px; }
+  55% { outline: 3px solid var(--yellow); outline-offset: 3px; }
+  100% { outline: 3px solid rgba(251, 212, 68, 0); outline-offset: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest.pinged, .loot.pinged { animation: none; outline: 3px solid var(--yellow); outline-offset: 3px; }
+}
 
 /* chest (contact) */
 .chest-zone { display: grid; place-items: center; padding: .4rem 0 .5rem; }
