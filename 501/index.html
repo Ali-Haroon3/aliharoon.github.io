@@ -3,210 +3,456 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>501 Daily</title>
-<meta name="description" content="Daily trivia darts. Start on 501, five darts, get as close to zero as you can.">
+<title>501</title>
+<meta name="description" content="Stat trivia darts. Name answers, their numbers come off your total, land on exactly zero.">
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root { --ink:#101423; --panel:#191e2e; --panel-2:#232a3f; --line:#3a4258; --text:#fff; --muted:#a8b0c4;
-  --yellow:#fff200; --red:#e5383b; --green:#318218; }
+:root { --bg:#0e1a28; --panel:#142438; --panel-2:#1b2f47; --line:#28415e; --text:#e9eff6; --muted:#8fa5bd;
+  --blue:#4aa8e8; --blue-ink:#071f33; --red:#ef5a6f; --green:#43c88a; }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--ink); color:var(--text); font:16px/1.4 Inter,system-ui,sans-serif; }
-main { max-width:560px; margin:0 auto; padding:24px 16px 48px; }
-h1 { font:400 64px/1 Anton,Impact,sans-serif; margin:0; letter-spacing:1px; }
-h1 span { color:var(--yellow); }
-.sub { color:var(--muted); margin:4px 0 20px; }
-.card { background:var(--panel); border:2px solid var(--line); box-shadow:6px 6px 0 #000; padding:16px;
-  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%); margin-bottom:20px; }
-.cat { font:400 28px/1.1 Anton,Impact,sans-serif; text-transform:uppercase; }
-.hint { color:var(--yellow); font-weight:600; margin:6px 0 0; }
-.src { color:var(--muted); font-size:13px; margin:4px 0 0; }
-.board { display:flex; justify-content:space-between; align-items:flex-end; margin:16px 0; }
-.score { font:400 112px/0.9 Anton,Impact,sans-serif; }
-.darts { text-align:right; color:var(--muted); font-weight:600; }
-.darts b { display:block; font:400 40px/1 Anton,Impact,sans-serif; color:var(--text); }
-form { display:flex; gap:8px; }
-input { flex:1; min-width:0; font:inherit; padding:12px; background:var(--panel-2); color:var(--text); border:2px solid var(--line); }
-input:focus { outline:3px solid var(--yellow); outline-offset:0; }
-button { font:400 20px Anton,Impact,sans-serif; letter-spacing:1px; padding:10px 18px; background:var(--yellow); color:#000;
-  border:0; box-shadow:4px 4px 0 #000; cursor:pointer; text-transform:uppercase; }
-button:active { transform:translate(2px,2px); box-shadow:2px 2px 0 #000; }
-#msg { min-height:1.4em; margin:10px 0 0; font-weight:600; }
-ol { list-style:none; padding:0; margin:0; }
-li { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid var(--line); }
-li:last-child { border:0; }
-.bust { color:var(--red); } .hit, .mine { color:var(--yellow); } .muted { color:var(--muted); }
-details { color:var(--muted); } summary { cursor:pointer; color:var(--text); font-weight:600; }
-#end h2 { font:400 40px/1 Anton,Impact,sans-serif; margin:0 0 8px; text-transform:uppercase; }
-#end details { margin-top:16px; } #all { max-height:320px; overflow-y:auto; margin-top:8px; padding-right:8px; }
-.win { border-color:var(--green); }
+html { color-scheme:dark; }
+body { margin:0; background:var(--bg); color:var(--text); font:15px/1.45 Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+main { max-width:1040px; margin:0 auto; padding:24px 16px 72px; }
+button, input { font:inherit; color:inherit; }
+button { cursor:pointer; }
+:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
 [hidden] { display:none !important; }
+.eyebrow { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0; }
+h1, h2 { margin:0; font-weight:900; text-transform:uppercase; line-height:1.05; }
+.muted { color:var(--muted); }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; }
+.btn { border:1px solid var(--line); background:var(--panel-2); border-radius:6px; padding:10px 18px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; }
+.btn:hover { border-color:var(--blue); }
+.btn.primary { background:var(--blue); border-color:var(--blue); color:var(--blue-ink); }
+.btn:disabled { opacity:.45; cursor:not-allowed; border-color:var(--line); }
+.tag { display:inline-block; background:var(--blue); color:var(--blue-ink); border-radius:3px; padding:6px 16px; transform:skewX(-12deg);
+  font-weight:800; font-size:13px; letter-spacing:.1em; text-transform:uppercase; }
+.tag > span { display:inline-block; transform:skewX(12deg); }
+.tag.sm { font-size:11px; padding:3px 10px; }
+.av { display:inline-grid; place-items:center; width:30px; height:30px; flex:none; border-radius:50%; border:2px solid var(--c);
+  color:var(--c); font-size:13px; font-weight:800; text-transform:uppercase; }
+
+/* Hub */
+.tabs { display:inline-flex; gap:4px; padding:4px; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:8px; }
+.tabs button { border:0; background:none; color:var(--muted); padding:8px 20px; border-radius:5px; font-weight:800; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+.tabs button[aria-selected="true"] { background:var(--blue); color:var(--blue-ink); }
+.hub-head h1 { font-size:clamp(56px, 14vw, 96px); color:var(--blue); letter-spacing:-.02em; margin:4px 0 8px; }
+.lede { max-width:620px; margin:0 0 24px; color:var(--muted); font-size:16px; }
+.lede b { color:var(--text); }
+.players { margin-bottom:28px; }
+#chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.chip { display:inline-flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:999px; padding:4px 6px 4px 4px; font-weight:600; }
+.chip button { border:0; background:none; color:var(--muted); font-size:18px; line-height:1; padding:2px 6px; }
+.chip button:hover { color:var(--red); }
+.add { display:flex; gap:8px; max-width:420px; }
+.add input, .search input { flex:1; min-width:0; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+.small { font-size:13px; margin:10px 0 0; }
+.group { margin-bottom:28px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; margin-top:10px; }
+.card { text-align:left; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:12px; }
+.card:hover { border-color:var(--blue); background:var(--panel-2); }
+.card-title { font-weight:800; font-size:16px; }
+.card-meta { display:flex; justify-content:space-between; align-items:center; }
+.card-start { font-weight:900; font-size:22px; color:var(--blue); font-variant-numeric:tabular-nums; }
+
+/* Game */
+.back { border:0; background:none; color:var(--muted); padding:0; margin-bottom:16px; font-weight:600; }
+.back:hover { color:var(--text); }
+.game-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+.game-head h2 { font-size:clamp(24px, 5vw, 40px); margin:6px 0 12px; }
+.start { text-align:right; }
+#start { font-weight:900; font-size:clamp(56px, 12vw, 96px); line-height:.9; color:var(--blue); font-variant-numeric:tabular-nums; }
+.note { margin:16px 0; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--muted); font-size:13px; }
+.controls { display:grid; grid-template-columns:auto 1fr auto auto; gap:10px; align-items:stretch; }
+.clock { display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:0 16px;
+  font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; white-space:nowrap; }
+.dot { width:9px; height:9px; border-radius:50%; background:var(--c); }
+.search { position:relative; display:flex; }
+.search input { border:2px solid var(--blue); padding:12px 14px; font-size:16px; }
+#opts { position:absolute; z-index:5; top:calc(100% + 4px); left:0; right:0; margin:0; padding:4px; list-style:none; background:var(--panel-2);
+  border:1px solid var(--line); border-radius:6px; max-height:320px; overflow-y:auto; box-shadow:0 12px 24px rgba(0,0,0,.35); }
+#opts li { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:4px; cursor:pointer; }
+#opts li[aria-selected="true"] { background:var(--blue); color:var(--blue-ink); font-weight:700; }
+#opts li.taken { color:var(--muted); cursor:not-allowed; }
+#opts li em { font-style:normal; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+#opts li.none { color:var(--muted); cursor:default; }
+#msg { min-height:22px; margin:10px 0 14px; font-weight:600; }
+#msg.bust { color:var(--red); } #msg.hit { color:var(--green); } #msg.miss { color:var(--muted); }
+.grid-wrap { overflow-x:auto; }
+.grid { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; margin:0 -6px; }
+.grid th, .grid td { background:var(--panel); border-radius:4px; padding:12px 14px; text-align:left; height:52px; }
+.grid .corner, .grid .rem th { background:none; }
+.grid th.rl { width:64px; text-align:center; font-weight:800; }
+.grid th.rl.now { color:var(--red); outline:1px solid var(--red); }
+.ph { border-bottom:3px solid var(--c); }
+.ph > div { display:flex; align-items:center; gap:10px; }
+.pn { font-weight:800; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ph.now .pn { color:var(--c); }
+.pts { margin-left:auto; color:var(--muted); font-weight:600; font-size:13px; white-space:nowrap; }
+.rem td > div { display:flex; justify-content:space-between; align-items:center; }
+.rem span { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+.rem b { font-size:20px; font-variant-numeric:tabular-nums; }
+.rem b.zero { color:var(--green); }
+.grid td > div { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.grid td b { white-space:nowrap; font-variant-numeric:tabular-nums; }
+.hit b { color:var(--green); } .bust b { color:var(--red); } .miss b, td.pass, td.done { color:var(--muted); }
+td.picking { outline:1px solid var(--red); text-align:center; color:var(--blue); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:13px; }
+.result { margin-bottom:16px; border-color:var(--blue); }
+.result h3 { margin:0 0 4px; font-size:24px; font-weight:900; text-transform:uppercase; }
+.result p { margin:0 0 14px; color:var(--muted); }
+.row { display:flex; flex-wrap:wrap; gap:8px; }
+.result details { margin-top:14px; }
+.result summary { cursor:pointer; font-weight:700; }
+#reveal { list-style:none; margin:10px 0 0; padding:0 8px 0 0; max-height:320px; overflow-y:auto; }
+#reveal li { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+#reveal li.used { color:var(--blue); font-weight:700; }
+.rules { margin-top:24px; color:var(--muted); font-size:14px; }
+.rules summary { color:var(--text); font-weight:700; cursor:pointer; }
+
+@media (max-width:640px) {
+  .controls { grid-template-columns:1fr 1fr; }
+  .clock, .search { grid-column:1 / -1; }
+  .clock { padding:12px 14px; }
+  .start { text-align:left; }
+  .grid th, .grid td { padding:10px; }
+}
 </style>
 </head>
 <body>
 <main>
-  <h1><span>501</span> Daily</h1>
-  <p class="sub" id="day"></p>
-
-  <div class="card">
-    <div class="cat" id="cat"></div>
-    <p class="hint" id="hint"></p>
-    <p class="src" id="src"></p>
-    <div class="board">
-      <div class="score" id="score" aria-live="polite">501</div>
-      <div class="darts">Darts left<b id="darts">5</b></div>
+  <section id="hub">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Mode">
+      <button role="tab" id="tab-solo" data-mode="solo" aria-selected="true">Solo</button>
+      <button role="tab" id="tab-party" data-mode="party" aria-selected="false">Party</button>
     </div>
-    <form id="throw">
-      <input id="guess" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Name one" aria-label="Your answer">
-      <button>Throw</button>
-    </form>
+    <div class="hub-head">
+      <p class="eyebrow">Stat trivia darts</p>
+      <h1>501</h1>
+      <p class="lede">Pick a board and you're in. You start on its <b>starting number</b>. Each round you name one answer and its stat comes off
+        your total. Land on <b>exactly 0</b>. Go under and it's a <b>bust</b>. Five rounds, closest to 0 wins.</p>
+    </div>
+    <div class="panel players" id="partyPanel" hidden>
+      <p class="eyebrow">Party players</p>
+      <div id="chips"></div>
+      <form class="add" id="addPlayer">
+        <input id="playerName" maxlength="14" autocomplete="off" placeholder="Add a player" aria-label="Player name">
+        <button class="btn">Add</button>
+      </form>
+      <p class="small muted" id="partyHint"></p>
+    </div>
+    <div id="groups"></div>
+  </section>
+
+  <section id="game" hidden>
+    <button class="back" id="back">&larr; Back to boards</button>
+    <div class="game-head">
+      <div>
+        <p class="eyebrow" id="meta"></p>
+        <h2 id="title"></h2>
+        <span class="tag"><span id="tag"></span></span>
+      </div>
+      <div class="start"><p class="eyebrow">Starting number</p><div id="start"></div></div>
+    </div>
+    <p class="note" id="note"></p>
+
+    <div class="panel result" id="result" hidden>
+      <h3 id="resultTitle"></h3>
+      <p id="resultText"></p>
+      <div class="row">
+        <button class="btn primary" id="again">Play again</button>
+        <button class="btn" id="share">Share results</button>
+        <button class="btn" id="toHub">Another board</button>
+      </div>
+      <details><summary>Every answer on this board</summary><ol id="reveal"></ol></details>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="clock" id="clock"><span class="dot"></span><span id="clockText"></span></div>
+      <div class="search">
+        <input id="q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="opts" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Search for an answer">
+        <ul id="opts" role="listbox" hidden></ul>
+      </div>
+      <button class="btn primary" id="lock" disabled>Lock in</button>
+      <button class="btn" id="pass">Pass</button>
+    </div>
     <p id="msg" role="status"></p>
-  </div>
+    <div class="grid-wrap"><table class="grid" id="grid"></table></div>
 
-  <div class="card" id="end" hidden>
-    <h2 id="endTitle"></h2>
-    <p id="endText"></p>
-    <button id="share">Send score</button>
-    <details><summary>Everything on today's board</summary><ol id="all"></ol></details>
-  </div>
-
-  <div class="card"><ol id="log"></ol></div>
-
-  <details>
-    <summary>How to play</summary>
-    <p>You start on 501 with 5 darts. Each dart is one answer from today's category, and its number comes off your score.
-    Big names take big chunks. Niche ones are how you finish.</p>
-    <p>Land on exactly 0 for a perfect game. If an answer would take you below 0, it's a bust: the dart is gone and your score stays put.</p>
-    <p>Whatever's left after 5 darts is your score. Lowest wins, so send it to your friends. New board every day.</p>
-  </details>
+    <details class="rules">
+      <summary>Rules</summary>
+      <p>Each answer's number comes off your remaining total. Land on exactly 0 and you're done. If an answer is bigger than what you have left,
+      it's a bust: the pick is wasted and your total stays put. The search box also lists answers from similar boards, and those score 0, so you
+      have to know who actually counts. Once someone picks an answer, nobody else can. Pass skips your pick. Picks snake each round, so last pick
+      in one round goes first in the next.</p>
+    </details>
+  </section>
 </main>
 
+<script src="boards.js"></script>
 <script>
-const PFR = 'Pro Football Reference, as of Nov 10, 2026', SSA = 'Social Security Administration, 2025 births';
-// data is "Name:value|Name:value", or "value:Name,Name|..." for long lists where many answers share a value.
-const CATS = [
-  { title: 'Packers passing TDs', hint: 'Career passing TDs for Green Bay. Anyone who threw one counts.', src: PFR, data:
-    "Brett Favre:442|Aaron Rodgers:475|Bart Starr:152|Lynn Dickey:133|Jordan Love:102|Tobin Rote:89|Don Majkowski:56|Randy Wright:31|Arnie Herber:66|David Whitehurst:28|Cecil Isbell:61|Curly Lambeau:24|Babe Parilli:31|Irv Comp:28|John Hadl:9|Zeke Bratkowski:21|Red Dunn:31|Scott Hunter:15|Jack Jacobs:21|Don Horn:16|Bob Monnett:28|Matt Flynn:16|Verne Lewellen:8|Brett Hundley:9|Tony Canadeo:16|Jerry Tagge:3|Mike Tomczak:11|Lamar McHan:11|Bobby Thomason:11|Anthony Dilweg:8|Jug Girard:5|Malik Willis:6|Blair Kiel:5|Jim Zorn:4|Scott Tolzien:1|Johnny Blood:3|John Roach:4|Roy McKay:6|Alan Risher:3|Paul Christman:7|Lou Brock:7|Eddie Kotal:2|Pid Purdy:1|Bo Molenda:5|Craig Nall:5|Doug Pederson:3|Carlos Brown:3|Hal Van Every:4|Rich Campbell:3|Paul Hornung:5|Jack Concannon:1|Stan Heath:1|Cub Buck:1|Charlie Mathys:10|Jim Del Gaizo:2|Vince Ferragamo:1|Joe Francis:2|Tom Moore:4|George Sauer Sr.:1|Paul Fitzgibbon:3|Don Milan:1|Roger Grove:2|Joe Laws:3|Matt Hasselbeck:2|Willard Harrell:4|Elijah Pitts:1|Hank Bruder:1|Russ Saunders:1|Ty Detmer:1|Ron Widby:1|Herm Rohrig:1|Bobby Douglass:1|Mule Wilson:1|Jack McAuliffe:1|Gerry Ellis:1|Bob Forte:1|Rick Norton:1|Jack Losch:1|Andy Uram:1|Herdis McCrary:1|MacArthur Lane:1|Donny Anderson:2|Don Hutson:1|Bubba Franks:1|Tim Masthay:1|Tony Fisher:1|Ahman Green:1|Fred Provo:1|Paul Ott Carruth:1" },
-  { title: 'Summer Olympic golds', hint: 'All-time gold medals by country, through Paris 2024. Old teams like the Soviet Union count.', src: 'Wikipedia, all-time Olympic medal table', data: "United States:1106|Soviet Union:395|Great Britain:303|China:303|France:243|Italy:229|Germany:214|Japan:189|Hungary:187|Australia:180|East Germany:153|Sweden:151|Russia:147|Netherlands:111|South Korea:109|Finland:101|Romania:93|Cuba:86|Canada:79|Poland:73|Norway:63|New Zealand:63|Bulgaria:57|West Germany:56|Switzerland:53|Spain:53|Denmark:50|Czechoslovakia:49|Belgium:47|Unified Team:45|Turkey:41|Brazil:40|Kenya:39|Ukraine:38|Greece:36|United Team of Germany:28|South Africa:28|Jamaica:27|Iran:27|Yugoslavia:26|Ethiopia:24|Argentina:22|Czech Republic:22|Austria:21|ROC:20|Uzbekistan:18|North Korea:16|Croatia:16|Kazakhstan:15|Ireland:15|Belarus:13|Mexico:13|Georgia:13|Thailand:11|Indonesia:10|Slovakia:10|India:10|Slovenia:10|Estonia:10|Azerbaijan:9|Egypt:9|Chinese Taipei:9|Serbia:9|Morocco:8|Bahamas:8|Algeria:7|Portugal:6|Lithuania:6|Tunisia:6|Colombia:5|Uganda:5|Latvia:4|Israel:4|Dominican Republic:4|Ecuador:4|Hong Kong:4|Pakistan:4|Bahrain:4|Nigeria:3|Chile:3|Venezuela:3|Trinidad and Tobago:3|Philippines:3|Australasia:3|Zimbabwe:3|Cameroon:3|Kosovo:3|Mongolia:2|Armenia:2|Serbia and Montenegro:2|Puerto Rico:2|Uruguay:2|Qatar:2|Fiji:2|Russian Empire:1|Peru:1|Vietnam:1|Singapore:1|Botswana:1|Jordan:1|Tajikistan:1|Grenada:1|Ivory Coast:1|Costa Rica:1|Panama:1|Syria:1|Guatemala:1|Burundi:1|Luxembourg:1|Saint Lucia:1|Bermuda:1|Mozambique:1|Suriname:1|United Arab Emirates:1|Dominica:1" },
-  { title: 'Saints passing TDs', hint: 'Career passing TDs for New Orleans. Anyone who threw one counts.', src: PFR, data:
-    "Drew Brees:491|Archie Manning:115|Aaron Brooks:120|Bobby Hebert:85|Jim Everett:60|Billy Kilmer:47|Dave Wilson:36|Derek Carr:40|Tyler Shough:24|Steve Walsh:25|Ken Stabler:17|Billy Joe Tolliver:15|Spencer Rattler:12|Andy Dalton:18|Bobby Scott:15|Edd Hargett:11|Wade Wilson:12|Taysom Hill:12|Richard Todd:14|Jameis Winston:20|John Fourcade:14|Billy Joe Hobert:13|Jeff Blake:13|Gary Cuozzo:7|Teddy Bridgewater:10|Bobby Douglass:5|Danny Wuerffel:9|Heath Shuler:2|Kerry Collins:4|Trevor Siemian:11|Todd Bouman:3|Jake Delhomme:3|Mike Buck:4|Doug Nussmeier:1|Larry Cipa:1|Karl Sweetan:1|Jim Ninowski:1|Jake Haener:1|Guido Merkens:2|Jamie Martin:1|Ronnie Lee South:1|Dalton Hilliard:4|Russell Erxleben:1|Willie Snead:1|Chuck Muncie:1|Andy Livingston:1|Hokie Gajan:1|Jack Holmes:1|Mario Bates:1|Cedrick Wilson Jr.:1|Lamar Smith:1|Deuce McAllister:1|Tom Myers:1|Kevin Ingram:1|Tom Blanchard:1" },
-  { title: "Girls' names", hint: 'Babies given the name in 2025, in hundreds, rounded. Top 1,000 names only.', src: SSA, data:
-    "135:Olivia|134:Charlotte|128:Emma|127:Amelia|126:Sophia|111:Mia|107:Isabella|91:Evelyn|83:Sofia|82:Eliana|77:Ava|76:Eleanor|75:Violet|71:Ailany,Aurora|68:Harper,Elizabeth|67:Lily|66:Camila|64:Nora|63:Hazel|62:Penelope,Chloe,Ellie,Lucy|61:Aria,Luna|60:Isla|58:Ella|57:Lainey|56:Zoe,Scarlett,Gianna|55:Emily|54:Valentina|53:Layla,Avery|51:Grace,Ivy|49:Madison,Abigail|48:Elena,Mila,Willow|47:Emilia,Nova|46:Naomi|44:Riley|43:Eloise|42:Sadie|41:Delilah,Stella,Josephine|40:Victoria,Sophie,Hannah,Lillian|39:Leah,Adeline|38:Leilani|37:Iris,Maya|36:Clara,Ruby|35:Alice,Genesis,Paisley,Claire|34:Zoey,Eden,Madelyn,Vivian,Millie|32:Emery,Daisy,Maeve|31:Ayla,Liliana,Melody,Lyla,Madeline|30:Josie,Lucia,Addison|29:Kennedy,Audrey,Maria|28:Autumn|27:Natalie,Sarah,Everly,Lydia,Kinsley,Sienna,Jade|26:Caroline,Quinn,Amara,Georgia,Juniper,Aaliyah,Margot,Allison,Hailey|25:Gabriella,Parker,Anna,Cecilia,Athena,Juliette,Catalina|24:Margaret,Cora,Rose,Eliza|23:Raelynn,Alaia,Brooklyn,Esther,Hallie,Hadley|22:Emerson,Elsie,Magnolia,Mary,Scottie,Valerie,Ariana,Serenity,Alina,Julia,Amira,Charlie,Eva|21:Savannah,Bella,Rylee,Emersyn,Elliana,Alana,Sloane,Melanie,Brielle|20:Natalia,Remi,Aubrey,Evangeline,Genevieve,Kehlani,June,Samantha,Summer,Oaklynn,Ember|19:Piper,Oakley,Phoebe,Arya,Wrenley,Sage|18:Alani,Valeria,Anastasia,Ashley,Nevaeh,Isabelle,Skylar,Ailani,Blair,Gemma,Rosalie,Vivienne,Ruth,Ariella,Callie|17:Freya,Isabel,Daphne,Lilah,Amaya,Sutton,Annie,Ximena,Adalynn,Kaylani,Katherine,Lila,Celeste,Tatum|16:Haven,Blakely,Reese,Kaia,Everleigh,Alora,Molly,Olive,Sara,Peyton|15:Lia,Mabel,Noelle,Stevie,Kylie,Vera,Jasmine,Celine|14:Adaline,Bailey,Myla,Aitana,Zara,Arabella,Lennon,Dahlia,Selah,Saylor,Elianna,Ada,River,Jane,Brianna,Elise,Alaina,Presley|13:Noa,Gracie,Mackenzie,Kiara,Rory,Wren,Palmer,Maisie,Arianna,Andrea,Nyla,Alexandra,Cataleya,Lucille,Camille,Collins,Delaney,Brynlee,Diana,Ana,Miriam,Amora|12:Reagan,Rowan,Rachel,Rosemary,Lilly,Kailani,Faith,Kaylee,Juliana,Amy,Journee,Leila,Adalyn,Mariana,Norah,Aliyah,Ophelia,Talia,Aspen,Elaina,Selena,Arleth,Evie,Nayeli|11:Khloe,Luciana,Juliet,Lola,Harmony,Lilith,Azalea,Lena,Alanna,Shiloh,Sylvie,Rosie,Antonella,Julieta,Meadow,Gia,Milani,Adelaide,Aurelia,Sawyer,Poppy|10:Aylani,Maggie,Blake,Dakota,Leia,Esme,Elowyn,Sylvia,Evelynn,Daniela,Kimberly,Adelina,Elaine,Joanna,Francesca,Octavia,Harlow,Elodie,Tessa,Morgan,Brooke,Catherine,Amina,Colette,Gabriela,Frances,Madisson,Samara,Sabrina,Marley|9:Kali,Nina,Serena,Alessia,Navy,Kendall,Zuri,Fatima,Viviana,Alayna,Lorelai,Hattie,Mira,Anaya,Aisha,Miley,Emory,Heidi,Teagan,Leighton,Annabelle,Ryleigh,Aylin,Paige,Angelina,Sydney,Malia,Rebecca,Maryam,Hope,Thea,Elora,Adelyn,Ariel,Kamila,Wrenlee,Itzel|8:Gwendolyn,Camilla,Briella,Helena,Kayla,Matilda,Adriana,Ariyah,Alaya,Raya,Adhara,Jordyn,Mallory,Esmeralda,Malani,Anya,Astrid,Vanessa,Ivory,Laura,Amari,Demi,Giselle,Nicole,Blaire,Kira,Liana,Kalani,Londyn,Carmen,Sunny,Florence,Kaliyah,Jocelyn,Danna,Regina,Bonnie,Murphy,Julianna,Melany,Briar,Lauren,Logan,Taylor,Raven,Carolina,Lana,Brynn,Angela,Annalise,Mckenna,Journey,Alayah,Laila,Nalani,Finley,Holly,Charlee|7:Harley,Joy,Melissa,Dorothy,Willa,Opal,Marceline,Sarai,Winter,Veronica,Trinity,Leona,Katalina,London,Dream,Maia,Vienna,Lyra,Salem,Hayden,Macie,Maddison,Payton,Lorelei,Gracelynn,Alessandra,Mya,Emmy,Lilliana,Adelynn,Mariah,Alma,Zariah,Calliope,Reign,Alyssa,Carter,Madeleine,Clementine,Wynter,Elisa,Kataleya,Alicia,Elle,Helen,Xiomara,Madilyn,Michelle,Gracelyn,Monroe,Daniella,Meredith,Fiona,Jaylani,Maren,Felicity|6:Alexandria,Winnie,Alison,Camryn,Rylie,Haisley,Saige,Renata,Anahi,Ainsley,Alivia,Aniyah,Arielle,Cameron,Brooklynn,Aubree,Amirah,Kora,Miracle,Amanda,Arlette,Solana,Charli,Maxine,Lakelynn,Edith,Bianca,Mae,Raelyn,Emely,Nylah,Mariam,Raegan,Yara,Beatrice,Estella,Scarlet,Alisson,Hanna,Remington,Analeia,Faye,Louise,Clover,Jream,Eve,Amber,Jovie,Kate,Marlowe,Madelynn,Iyla,Virginia,Amoura,Lottie,Cecelia,Jayla,Romina,Skye,Nellie,Phoenix,Oaklee,Marlee,Jazlyn,Daleyza,Lenora,Zahra,Cassidy,April,Heaven,Priscilla,Everlee,Angel,Capri,Kyomi,Danielle,Holland|5:Fernanda,Frankie,Emerie,Alexis,Amaia,Kamryn,Stephanie,Jacqueline,Margo,Lilian,Mavis,Armani,Della,Izabella,Nadia,Amalia,Ivanna,Makayla,Allie,Hadassah,Miller,Lina,Estelle,Cali,Sevyn,Mckenzie,Cleo,Jimena,Imani,Kyla,Kailany,Reina,Noemi,Jordan,Lylah,Jennifer,Alia,Chaya,Mara,Marigold,Meilani,Paris,Makenna,Reyna,Avianna,Halle,Mina,Tiana,Elliott,Seraphina,Emelia,Marina,Aliana,Alejandra,Mylah,Loretta,Flora,Brinley,Rosalia,Siena,Leyla,Estrella,Halo,Ari,Ariya,Sierra,Campbell,Marie,Anne,Amiyah,Goldie,Keira,Selene,Noah,Sariyah,Maliyah,Winona,Lexi,Rivka,Azariah,Cassandra,Andi,Gabrielle,Indie,Destiny,Ariah,Oaklyn,Azaria,Rhea,Lyric,Violeta,Arlet,Ellianna|4:Aya,Zariyah,Katie,Galilea,Thalia,Shelby,Andie,Irene,Alara,Rosa,Eileen,Gloria,Miranda,Aleena,Hana,Noor,Melina,Briana,Legacy,Myra,Isabela,Jessica,Jolene,Marisol,Oakleigh,Paislee,Birdie,Skyler,Yaretzi,Lakelyn,Laney,Aliza,Lillie,Whitley,Amani,Jenna,Alondra,Rosalina,Ellis,Coraline,Sasha,Wrenleigh,Chana,Dallas,Emberly,Georgina,Khaleesi,Billie,Kinley,Lara,Baylor,Emmie,Leilany,Louisa,Romy,Rowyn,Makenzie,Averie,Nia,Merritt,Robin,Angie,Drew,Alena,Angelica,Kennedi,Jazmin,Analia,Leslie,Martha,Mckinley,Ryan,Dayana,Lennox,Ila,Karsyn,Macy,Remy,Sol,Samira,Bridget,Gwen,Theodora,Keilani,Bristol,Kathryn,Iliana,Abby,Taytum,Ramona,Laurel,Persephone,Kenzie,Monica,Lacey,Veda,Penny,Emerald,Kensley,Kiana,Valery,Maisy,Araceli,Dani,Mikayla,Davina,Karina,Adele,Bethany,Milan,Amaris,Rynlee,Kaeli,Lettie,Soleil,Kenna,Charley,Marilyn,Neriah,Xyla,Elina,Kiyomi,Azari,Keziah,Indy,Laylani,Christina,Dulce,Freyja,Maci,Celia,Malaya,Inaya,Pearl|3:Evelina,Fallon,Luella,Ruthie,Royalty,Janiyah,Paulina,Belen,Journi,Ocean,Elouise,Emiliana,Judith,Klarity,Alaiya,Paloma,Yareli,Cielo,Rayna,Bellamy,Elowen,Aileen,Dalia,Janelle,Kaitlyn,Karla,Kayleigh,Adley,Avani,Brynleigh,Dylan,Treasure,Zainab,Charleigh,Milana,Naya,Kelsey,Quincy,Jenesis,Aura,Romi,Julietta,Livia,Keyla,Nola,Aliya,Jessie,Nyomi,Promise,Aila,Amelie,Celina,Kyra,Layan,Zelda,Erin,Ezra,Zaniyah,Denver,Braelynn,Jaliyah,Luz,Sloan,Amayah,Hunter,Michaela,Elani,Ensley,Honey,Tara,Lea,Kendra,Magdalena,Chelsea,Kelly,Anaiah,Indigo,Paula,Nala,Darcy,Jamie,Lilia,Madilynn,Haley,Arisbeth,Ayleen,Deborah,Eleanora,Jemma,Mercy,Soraya,Aspyn,Ayah,Johanna,Adrianna,Julie,Marianna,Kahlani,Kylee,Lyanna,Giovanna,Siya,Tiffany,Colbie,Emi,Odette,Rebekah,Tilly,Vada,Aviana,Berkley,Megan,Leanna,Lilianna,Anais,Mariel,Violette,Chandler,Liv,Naylani,Ainara,Guinevere,Liora,Maizie,Linda,Luisa,Khalani,Kollyns,Rayne,Nataly,Greta,Micah,Stormi,Teresa,Bennett,Anayah,Eliora,Giuliana,Raina,Sarahi,Elyse,Zaylee,Cheyenne,Giana,Emmeline,Winifred,Clare,Elisabeth,Ivey,Maddie,Brittany,Emberlynn,Etta,Hadlee,Ailanny,Aleia,Kallie,Landry,Kimber,Salma,Alianna,Ayra,Tallulah,Darla,Elara,Mariella,Saanvi,Zaria,Madalyn,Sunday,Marcella,Sky,Milena,Sariah,Yuna,Zyla,Rosalee,Anika,Kinslee,Love,Malaysia,Yasmin,Aadhya,Ainhoa,August,Bexley,Amiri,Aleah,Mazie,Nancy,Barbara,Zora,Elia,Leylani,Ashlyn,Jianna,Tru,Arden,Marleigh,Novalee,Kori,Roselyn,Ashlynn,Cordelia,Khadija,Akira,Arely,Kamiyah,Skyla,Adalee,Addilyn,Karter,Laken,Lisa,Brylee,Jazmine,Kaiya,Annika,Jaslyn,Scout,Simone,Corinne,Harmoni" },
-  { title: 'Patriots passing TDs', hint: 'Career passing TDs for New England. Anyone who threw one counts.', src: PFR, data:
-    "Tom Brady:541|Drew Bledsoe:166|Steve Grogan:182|Babe Parilli:132|Tony Eason:60|Jim Plunkett:62|Drake Maye:64|Mac Jones:46|Hugh Millen:17|Matt Cassel:23|Mike Taliaferro:27|Butch Songin:36|Matt Cavanaugh:19|Cam Newton:8|Marc Wilson:9|Bailey Zappe:11|Doug Flutie:11|Tom Hodson:7|Tom Yewcic:12|Scott Zolak:8|Jacoby Brissett:2|Tom Sherman:12|Joe Kapp:3|Tom Ramsey:6|Scott Secules:2|Brian Hoyer:2|Jimmy Garoppolo:5|Tom Owen:3|Don Trull:1|Brian Dowling:2|Jarrett Stidham:2|Eddie Wilson:1|Tom Greene:1|Neil Graff:2|Joe Milton:1|Jeff Carlson:1|Andy Johnson:4|Bob Bleier:1|Julian Edelman:1|Dick Christy:2|Jakobi Meyers:2|Michael Bishop:1|David Patten:1|Dave Meggett:1|Mosi Tatupu:1|Vinny Testaverde:1|Gino Cappelletti:1|Craig James:3|Kendrick Bourne:1|Jon Vaughn:1|Adam Vinatieri:1" },
-  { title: 'Country populations', hint: 'Population in millions, rounded. Places under half a million are off the board.', src: 'UN estimates for mid-2023, via Wikipedia', data: "India:1438|China:1423|United States:343|Indonesia:281|Pakistan:248|Nigeria:228|Brazil:211|Bangladesh:171|Russia:145|Mexico:130|Ethiopia:129|Japan:124|Philippines:115|Egypt:115|DR Congo:106|Vietnam:100|Iran:91|Turkey:87|Germany:85|Thailand:72|United Kingdom:69|Tanzania:67|France:66|South Africa:63|Italy:59|Kenya:55|Myanmar:54|Colombia:52|South Korea:52|Sudan:50|Uganda:49|Spain:48|Algeria:46|Argentina:46|Iraq:45|Afghanistan:41|Yemen:39|Canada:39|Poland:39|Ukraine:38|Morocco:38|Angola:37|Uzbekistan:36|Malaysia:35|Peru:34|Ghana:34|Mozambique:34|Saudi Arabia:32|Madagascar:31|Ivory Coast:31|Nepal:30|Cameroon:28|Venezuela:28|Australia:26|North Korea:26|Niger:26|Mali:24|Syria:24|Taiwan:23|Burkina Faso:23|Sri Lanka:23|Malawi:21|Zambia:21|Kazakhstan:20|Chile:20|Chad:19|Romania:19|Somalia:18|Guatemala:18|Senegal:18|Netherlands:18|Ecuador:18|Cambodia:17|Zimbabwe:16|Guinea:14|Benin:14|Rwanda:14|Burundi:14|Bolivia:12|Tunisia:12|Belgium:12|Haiti:12|South Sudan:11|Jordan:11|Dominican Republic:11|Cuba:11|Czechia:11|Honduras:11|United Arab Emirates:11|Sweden:11|Portugal:10|Tajikistan:10|Papua New Guinea:10|Azerbaijan:10|Greece:10|Hungary:10|Togo:9|Israel:9|Austria:9|Belarus:9|Switzerland:9|Sierra Leone:8|Laos:8|Hong Kong:7|Turkmenistan:7|Libya:7|Kyrgyzstan:7|Paraguay:7|Nicaragua:7|Bulgaria:7|Serbia:7|El Salvador:6|Congo:6|Denmark:6|Singapore:6|Lebanon:6|Finland:6|Norway:6|Slovakia:6|Liberia:5|Palestine:5|Ireland:5|New Zealand:5|Central African Republic:5|Costa Rica:5|Oman:5|Mauritania:5|Kuwait:5|Panama:4|Croatia:4|Georgia:4|Eritrea:3|Mongolia:3|Uruguay:3|Puerto Rico:3|Bosnia and Herzegovina:3|Moldova:3|Qatar:3|Namibia:3|Armenia:3|Lithuania:3|Jamaica:3|Albania:3|Gambia:3|Gabon:2|Botswana:2|Lesotho:2|Guinea-Bissau:2|Slovenia:2|Latvia:2|Equatorial Guinea:2|North Macedonia:2|Kosovo:2|Bahrain:2|Trinidad and Tobago:2|Timor-Leste:1|Estonia:1|Cyprus:1|Mauritius:1|Eswatini:1|Djibouti:1|Fiji:1|Réunion:1|Comoros:1|Guyana:1|Solomon Islands:1|Bhutan:1|Macao:1|Luxembourg:1|Montenegro:1|Suriname:1|Western Sahara:1|Malta:1|Maldives:1|Cape Verde:1" },
-  { title: 'Colts passing TDs', hint: 'Career passing TDs for the Colts. Baltimore and Indianapolis both count.', src: PFR, data:
-    "Peyton Manning:399|Johnny Unitas:287|Andrew Luck:171|Bert Jones:122|Jack Trudeau:41|Jeff George:41|Jim Harbaugh:49|Mike Pagel:39|Jacoby Brissett:31|Earl Morrall:47|Daniel Jones:25|Philip Rivers:28|Carson Wentz:27|Marty Domres:21|Greg Landry:17|Gardner Minshew II:15|Gary Hogeboom:22|Matt Ryan:14|George Shaw:21|Anthony Richardson:11|Chris Chandler:10|Matt Hasselbeck:11|Paul Justin:7|Bill Troup:10|Gary Kerkorian:11|Joe Flacco:12|Curtis Painter:6|Gary Cuozzo:13|Fred Enke:8|Dan Orlovsky:6|Don Majkowski:6|Art Schlichter:3|Jim Sorgi:6|Mark Herrmann:2|Craig Erickson:3|Sam Ehlinger:3|Kerry Collins:2|Kelly Holcomb:1|Blair Kiel:3|Riley Leonard:2|Brian Hoyer:4|Scott Tolzien:1|Lamar McHan:4|Matt Kofler:1|Tom Ramsey:1|Tom Matte:2|Jack Del Bello:1|George Taliaferro:2|Mike Kirkland:1|Jim Ward:2|Tom Tupa:1|Josh Freeman:1|Ed Mioduszewski:2|Ed Brown:1|Joe Washington:2|Ray Brown:1|Kerwin Bell:1|Curtis Dickey:1|Ryan Lindley:1|Cotton Speyrer:1|Ken Dilger:1|Lenny Moore:2|Joseph Addai:1|Don McCauley:1|Mike Wood:1" },
-  { title: "Boys' names", hint: 'Babies given the name in 2025, in hundreds, rounded. Top 1,000 names only.', src: SSA, data:
-    "208:Liam|204:Noah|149:Oliver|134:Theodore|120:Henry|119:James|111:Elijah|110:Mateo|105:William|102:Lucas|98:Benjamin|96:Levi|88:Elias,Luca|87:Jack|86:Sebastian,Hudson|83:Samuel|82:Leo|81:Ezra,Michael,Daniel|80:John|79:Ethan|76:Julian,Santiago|75:Cooper,Asher|73:Joseph|72:Alexander,Owen|70:Matthew|69:Luke,Thomas|68:David|66:Jackson,Gabriel|65:Wyatt|63:Mason,Bennett|62:Dylan,Roman,Jacob|61:Miles|60:Carter,Anthony,Isaac|59:Charles,Maverick|58:Thiago,Grayson|56:Wesley,Logan|55:Josiah,Weston|54:Waylon|53:Isaiah|52:Caleb,Rowan,Beau|51:Ezekiel|50:Aiden,Nathan|49:Brooks|48:Nolan,Joshua,Angel|47:Christopher,Lincoln,Jayden|46:Silas,Enzo|45:Andrew,Adrian|44:Atlas|43:Cameron,Everett|42:Walker|41:Axel|40:Aaron,August|39:Theo,Ian,Adriel,Luka,Gael|38:Arthur,Jeremiah,Jonathan,Micah,Leonardo,Robert,Kai|37:Emiliano,Jose|36:Christian,Eithan,Archer|35:Ryan,Myles,Adam,Parker|34:Colton,Eli|33:Amir,Dominic,Vincent|32:Xavier,Damian,Easton|31:River,Nicholas,Austin,Jace,Jaxon,Harrison,Lorenzo|30:Callum,Milo,Graham,Emmett|29:Sawyer,Giovanni,Carson,Dean|28:George,Landon,Jonah,Jasper,Hunter|27:Jordan,Calvin,Ryder,Malachi,Kayden,Stetson|26:Jameson,Leon,Declan,Nathaniel|25:Beckett,Zion,Dawson,Luis,Charlie,Matteo|24:Elian,Arlo,Greyson,Carlos,Elliot,Bryson,Evan,Emilio,Jude,Jaxson,Colter,Diego|23:Juan,Elliott,Hayden|22:Hayes,Ivan,Ace,Jason,Connor,Jayce,Beckham,Jett|21:Matias,Barrett,Braxton,Jesus,Nico,Felix,Antonio,Nicolas,Judah|20:Emmanuel,Max,Tucker,Cole,Ryker,Jesse,Amari,Aziel,Peter|19:Rhett,Maxwell,Callan,Alan,Chase,Legend,Tate|18:Alejandro,Knox,Ashton,Jaziel,Rory|17:Andres,Caden,Tatum,Timothy,Kingston,Camden,Finn,Messiah,Riley,Abraham,Maddox,Victor,Miguel,Malakai,Zayden|16:Bentley,Zachary,Baker,Rafael,Joel,Tyler,Kevin,Griffin,Oscar,Edward,Cohen,Kairo,Callahan,Grant|15:Brayden,Simon,Abel,Alex,Justin,Richard,Patrick,Brody,Kaiden,Dallas,Muhammad,Warren,Adonis|14:Milan,Ellis,Kyrie,Mark,Shepherd,Ronan,Cade,Louis,Lane,Harvey,Walter,Zayn,Emerson,Nash,Crew|13:Ayden,Marcus,Xander,Omar,Brandon,Paul,Ismael,Kayson,Bodhi,Bowen,Saint,Cyrus,Koa,Karter,Steven,Malcolm,Eric,Javier|12:Bodie,Maximus,Otto,Shiloh,Benson,Maximiliano,Atticus,Jensen,Tobias,Derek,Colt,Kash,Cash,Lukas,Lennox,Ares,Avery,Jeremy,Reid|11:Kenneth,Kaleb,Kohen,Holden,Sonny,Preston,Clayton,Archie,Romeo,Gavin,Angelo,Luciano,Ali,Remington,Dante,Tristan,Banks,Colson,Mathias,Eliam,Sullivan,Israel,Blake,Zyaire,Cody,Dakota,Casey,Brady,Francisco,Jorge,Zane|10:Niko,Aidan,Dariel,Kaden,Phoenix,Josue,Cruz,Sutton,Finley,Orion,Martin,Bryan,Gideon,Paxton,Brian,Marshall,Cairo,Jax,Colin|9:Wade,Russell,Sterling,Wells,Ezequiel,Kade,Leonel,Ibrahim,Damien,Santino,Hendrix,Joaquin,Briggs,Bryce,Titus,Franklin,Spencer,Jaylen,Cristian,Anderson,Kaizen,Onyx,Erick,Kyaire,Andre,Miller,Marco,Manuel,Matthias,Grady,Forrest|8:Kayce,Desmond,Clark,Hugo,Daxton,Ricardo,Lawson,Winston,Stephen,Khalil,Cesar,Baylor,Fernando,Elio,Kieran,Iker,Kamari,Jay,Ari,Raphael,Raymond,Jared,Zander,Edwin,Marcelo,Kashton,Kian,Kylo,Bradley,Kyler,King,Leandro,Augustus,Remy,Hector,Eduardo,Koda,Rhys,Hank,Cayden,Kaysen,Rylan,Conrad,Killian,Reed,Francis,Jaden,Solomon,Boone,Julius,Lucca,Isaias,Tadeo,Lian|7:Nehemiah,Pablo,Wilder,Raiden,Lewis,Travis,Frederick,Moshe,Malik,Mario,Jasai,Sylas,Sergio,Chance,Jalen,Valentino,Apollo,Uriel,Prince,Dalton,Bo,Yusuf,Kane,Rome,Karson,Oakley,Pedro,Sage,Jake,Johnny,Rocco,Reece,Esteban,Lucian,Mack,Soren,Ayaan,Kameron,Quinn,Fabian,Alijah,Musa|6:Kyson,Azariah,Zayne,Ford,Tanner,Royal,Samson,Noel,Cassian,Ruben,Makai,Adan,Asa,Kasen,Hezekiah,Edgar,Nasir,Rowen,Sean,Arjun,Caspian,Rodrigo,Collin,Leland,Armani,Donovan,Alessandro,Jasiah,Brantley,Royce,Damon,Odin,Zaire,Ronin,Pierce,Gunner,Cillian,Johnathan,Kyle,Leonidas,Alonzo,Corbin,Alexis,Frank,Moses,Callen,Marcos,Denver,Kobe,Lawrence,Truett,Tripp,Chozen,Gianni,Roy,Finnegan,Mohamed,Philip,Azriel,Ridge,Tyson,Rio,Troy,Scott,Kendrick,Bruce,Eiden,Zachariah,Dorian,Kaison,Hamza,Akari,Cal,Eden|5:Augustine,Erik,Fletcher,Devin,Ozzy,Eliseo,Emir,Jeffrey,Drew,Ledger,Chosen,Armando,Saul,Ariel,Morgan,Porter,Deacon,Mohammad,Zakai,Garrett,Andy,Colsen,Zain,Rocky,Jakai,Roberto,Enrique,Johan,Clay,Emanuel,Rhodes,Jamari,Jamie,Allen,Kylan,Maximo,Seth,Atreus,Cassius,Kyren,Camilo,Eliel,Moises,Rayan,Vicente,Maximilian,Tru,Jamir,Gregory,Kolton,Mohammed,Louie,Kason,Alden,Jonas,Kolter,Krew,Caiden,Reese,Amiri,Nikolai,Lachlan,Abdiel,Roland,Zaiden,Eziah,Kyro,Gunnar,Jakari,Albert,Colby,Yahya,Harlan,Jaiden,Westley,Boston|4:Keegan,Dominick,Koen,Kylian,Gustavo,Hassan,Arturo,Danny,Jayceon,Kenzo,Sincere,Nathanael,Zayd,Raul,Izaiah,Shane,Leonard,Ronald,Kasai,Memphis,Julio,Amias,Samir,Lochlan,Azael,Chris,Sam,Anakin,Keanu,Uriah,Phillip,Otis,Princeton,Quincy,Wayne,Azrael,Jaime,Tommy,Lionel,Valentin,Aries,Layne,Creed,Mauricio,Yosef,Chaim,Jaxton,Davis,Ahmad,Major,Wylder,Benicio,Wilson,Vincenzo,Houston,Madden,Zaid,Gerardo,Salem,Trevor,Aurelio,Shawn,Jasiel,Peyton,Taylor,Briar,Omari,Dereck,Westin,Donald,Tomas,Dax,Dexter,Idris,Duke,Mac,Sevyn,Evander,Marvin,Jayson,Bridger,Kareem,Ahmed,Bryer,Robin,Ryland,Dennis,Ozias,Julien,Aarav,Aron,Carmelo,Kenai,Layton,Ryatt,Wes,Jase,Kamden,Nikolas,Ocean,Bellamy,Cannon,Neithan,Westyn,Braylen,Jahmir,Lee,Ander,Dustin,Amos,Marcel,Hugh,Case,Misael,Ambrose,Huxley,Mylo,Zahir,Rudy,Bruno,Yehuda,Abram,Clyde|3:Brixton,Yousef,Enoch,Franco,Bode,Azaiah,Forest,Matheo,Junior,Chandler,Murphy,Noe,Salvador,Finnley,Trace,Zyair,Dario,Mustafa,Ayan,Abdullah,Campbell,Magnus,Santos,Izael,Brayan,Boden,Emmitt,Keaton,Reign,Asaiah,Truce,Harry,Riggs,Alvaro,Corey,Dutton,Zamir,Blaze,Kyree,Skyler,Tony,Alonso,Jamison,Remi,Darius,Elisha,Barron,Fisher,Ray,Jaxxon,Teo,Haziel,Everest,Crue,Thaddeus,Calum,Kaisen,Keith,Raylan,Zeke,Brewer,Dilan,Mccoy,Douglas,Lennon,Azai,Brock,Jones,Rohan,Ty,Benedict,Emery,Yahir,Jrue,Yael,Alberto,Alfredo,Dane,Ira,Teddy,Jettson,Nelson,Yisroel,Drake,Flynn,Bjorn,Ignacio,Jefferson,Avi,Rayden,Roger,Cayson,Kaiser,Dakari,Alvin,Yadiel,Alfred,Benny,Casen,Ben,Coleson,Conor,Cason,Jimmy,Braylon,Waylen,Derrick,Neil,Ramon,Bear,Jeremias,Santana,Zechariah,Evren,Avyaan,Rex,Aslan,Eddie,Lance,Stanley,Conner,Jesiah,Zev,Alessio,Brycen,Carlo,Edison,Adler,Aryan,Orlando,Abner,Coast,Jedidiah,Joey,Ernesto,Kylen,Denim,Jireh,Eren,Emory,Izan,Jagger,Jericho,Kolson,Leroy,Reuben,Trey,Boaz,Shepard,Eliezer,Hollis,Ishaan,Laith,Alistair,Kaleo,Lucien,Marcello,Foster,Guillermo,Kael,Kannon,Nael,Axton,Jerry,Rey,Scottie,Vihaan,Yitzchok,Koah,Beck,Ezrah,Issac,Stone,Leif,Makari,Wesson,Aspen,Eitan,Frankie,Shmuel,Casper,Kiaan,Neythan,Caius,Darian,Agastya,Dillon,Halo,Heath,Isa,Judson,Jairo,Kreed,Krue,Massimo,Syaire,Khalid,Rowdy,Veer|2:Eugene,Kenji,Salvatore,Zymir,Zyon,Meir,Ricky,Josias,Jon,Agustin,Jethro,Mitchell,Felipe,Gian,Legacy,Damari,Melvin,Aldo,Darwin,Montgomery,Shimon,Wallace,Arian,Colten,Mordechai,Quentin,Imran,Beaux,Harlem,Van,Gage,Kaycen,Mathew,Quinton,Alec,Azlan,Toby,Ameer,Byron,Damir,Loyal,Anders,Curtis,Dominik,Joan,Ephraim,Isael,Jiraiya,Aurelius,Blaine,Harold,Joe,Palmer,Landry,Oziel,Macklin,Kabir,Langston" },
-];
-// Other names people type for the same country. A|B means whichever is on today's board.
-const ALIASES = {
-  usa: 'United States', us: 'United States', america: 'United States', unitedstatesofamerica: 'United States',
-  uk: 'United Kingdom|Great Britain', britain: 'United Kingdom|Great Britain', unitedkingdom: 'Great Britain', greatbritain: 'United Kingdom',
-  ussr: 'Soviet Union', korea: 'South Korea', dprk: 'North Korea', holland: 'Netherlands', burma: 'Myanmar',
-  czechrepublic: 'Czechia', czechia: 'Czech Republic', taiwan: 'Chinese Taipei', chinesetaipei: 'Taiwan',
-  cotedivoire: 'Ivory Coast', drc: 'DR Congo', democraticrepublicofthecongo: 'DR Congo', uae: 'United Arab Emirates',
-  turkiye: 'Turkey', swaziland: 'Eswatini', easttimor: 'Timor-Leste', caboverde: 'Cape Verde', macau: 'Macao',
-  bosnia: 'Bosnia and Herzegovina', trinidad: 'Trinidad and Tobago', saudi: 'Saudi Arabia',
-};
-const START = 501, DARTS = 5;
-const SUFFIX = /\s+(jr|sr|ii|iii|iv)\.?$/i;
-const norm = s => s.trim().toLowerCase().replace(/^the\s+/, '').replace(SUFFIX, '').normalize('NFD').replace(/[^a-z0-9]/g, '');
-const lev = (a, b) => { // edit distance, for typos
-  let prev = [...Array(b.length + 1).keys()];
+const ROUNDS = 5, MAX_PLAYERS = 6;
+const COLORS = ['#ef5a6f', '#4aa8e8', '#e9eff6', '#43c88a', '#f2b84b', '#b38cf5'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+const lev = (a, b) => { // edit distance counting a swapped pair as one typo, for autocorrect
+  let pp = [], prev = [...Array(b.length + 1).keys()];
   for (let i = 1; i <= a.length; i++) {
     const cur = [i];
-    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] !== b[j - 1]));
-    prev = cur;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] !== b[j - 1]));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) cur[j] = Math.min(cur[j], pp[j - 2] + 1);
+    }
+    pp = prev; prev = cur;
   }
   return prev[b.length];
 };
 
-// ponytail: categories rotate in order from day 1; add more to CATS to stretch the cycle.
-const now = new Date();
-const today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-const dayNum = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2026, 10, 10)) / 864e5) + 1;
-const cat = CATS[((dayNum - 1) % CATS.length + CATS.length) % CATS.length];
+// Boards share a search pool with similar boards, so the dropdown never tells you who is on this one.
+const POOLS = {};
+for (const b of BOARDS) {
+  b.values = new Map(b.data.split('|').flatMap(s => { const i = s.indexOf(':'); return s.slice(i + 1).split(',').map(n => [n, +s.slice(0, i)]); }));
+  for (const n of b.values.keys()) (POOLS[b.pool] ??= new Set()).add(n);
+}
+const term = s => ({ key: norm(s), words: s.split(/[\s.'-]+/).map(norm).filter(Boolean) });
+for (const k in POOLS) POOLS[k] = [...POOLS[k]].map(name => ({ name, terms: [name, ...(ALIASES[name] || '').split('|').filter(Boolean)].map(term) }));
 
-const board = cat.data.split('|').flatMap(s => {
-  const [a, b] = s.split(':');
-  return /^\d+$/.test(a) ? b.split(',').map(n => [n, +a]) : [[a, +b]];
-}).map(([name, value]) => {
-  const words = name.replace(SUFFIX, '').split(' ');
-  return { name, value, key: norm(name), tails: [norm(words.at(-1)), norm(words.slice(1).join(' '))] };
-});
-
-// Exact name (or alias) returns the entry. Anything else returns close matches to suggest.
-function lookup(text) {
-  const q = norm(text);
+// Lower is a better match: exact, words started, inside a word, then typos (last-name typos first).
+function rank(t, q, qw, tol) {
+  if (t.key === q) return 0;
+  if (qw.every(w => t.words.some(x => x.startsWith(w)))) return 1;
+  if (t.words.some(x => x.includes(q))) return 2;
+  let s = t.key.startsWith(q) ? 3.5 : Infinity; // runs across words, like "aaronrod"
+  if (!tol) return s;
+  t.words.forEach((w, i) => {
+    const d = Math.min(lev(q, w), lev(q, w.slice(0, q.length)));
+    if (d <= tol) s = Math.min(s, (i === t.words.length - 1 ? 2 : 2.5) + d);
+  });
+  const d = lev(q, t.key.slice(0, q.length));
+  return d <= tol ? Math.min(s, 3.5 + d) : s;
+}
+function search(text, pool) {
+  const q = norm(text), qw = text.split(/[\s.'-]+/).map(norm).filter(Boolean);
   if (!q) return [];
-  const hit = board.find(e => e.key === q) || (ALIASES[q] || '').split('|').map(n => board.find(e => e.name === n)).find(Boolean);
-  if (hit) return hit;
-  const close = t => t === q || (q.length >= 4 && lev(t, q) <= (q.length >= 6 ? 2 : 1));
-  return board.filter(e => [e.key, ...e.tails].some(t => t && close(t)));
+  const tol = q.length >= 6 ? 2 : q.length >= 4 ? 1 : 0, hits = [];
+  for (const item of pool) {
+    const s = Math.min(...item.terms.map(t => rank(t, q, qw, tol)));
+    if (s < Infinity) hits.push([s, item]);
+  }
+  return hits.sort((a, b) => a[0] - b[0] || a[1].name.length - b[1].name.length || a[1].name.localeCompare(b[1].name)).slice(0, 8).map(h => h[1]);
 }
 
-const $ = id => document.getElementById(id);
-$('day').textContent = `Day ${dayNum}`;
-$('cat').textContent = cat.title;
-$('hint').textContent = cat.hint;
-$('src').textContent = 'Source: ' + cat.src;
+/* Players: solo by default. Party mode is pass-the-phone with 2 to 6 names. */
+const solo = { name: 'You', pts: 0 }, HINT = 'Add 2 to 6 players, then pick a board. Pass the phone around. Picks snake each round.';
+let mode = 'solo', party = [], players = [solo];
+try { const saved = JSON.parse(localStorage.getItem('501-party')); if (Array.isArray(saved)) party = saved.slice(0, MAX_PLAYERS).map(name => ({ name: String(name).slice(0, 14) || '?', pts: 0 })); } catch {}
+const saveParty = () => { try { localStorage.setItem('501-party', JSON.stringify(party.map(p => p.name))); } catch {} };
 
-let state = { day: today, cat: cat.title, throws: [] }; // throws: [name, value, bust]
-try { const s = JSON.parse(localStorage.getItem('501')); if (s && s.day === today && s.cat === cat.title) state = s; } catch {}
-const save = () => { try { localStorage.setItem('501', JSON.stringify(state)); } catch {} };
+function renderHub() {
+  $('tab-solo').setAttribute('aria-selected', mode === 'solo');
+  $('tab-party').setAttribute('aria-selected', mode === 'party');
+  $('partyPanel').hidden = mode !== 'party';
+  $('chips').innerHTML = party.map((p, i) => `<span class="chip"><span class="av" style="--c:${COLORS[i]}">${esc(p.name[0])}</span>${esc(p.name)}` +
+    `<button data-rm="${i}" aria-label="Remove ${esc(p.name)}">&times;</button></span>`).join('');
+  $('addPlayer').hidden = party.length >= MAX_PLAYERS;
+  $('partyHint').textContent = HINT;
+}
+$('tabs').addEventListener('click', e => { const m = e.target.dataset.mode; if (m) { mode = m; renderHub(); } });
+$('addPlayer').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('playerName').value.trim();
+  if (!name) return;
+  party.push({ name, pts: 0 });
+  $('playerName').value = '';
+  saveParty(); renderHub();
+  $('playerName').focus();
+});
+$('chips').addEventListener('click', e => {
+  const i = e.target.dataset.rm;
+  if (i === undefined) return;
+  party.splice(+i, 1);
+  saveParty(); renderHub();
+});
 
-const left = () => state.throws.reduce((s, [, v, bust]) => bust ? s : s - v, START);
-const over = () => left() === 0 || state.throws.length >= DARTS;
+const groups = [...new Set(BOARDS.map(b => b.group))];
+$('groups').innerHTML = groups.map(g => `<section class="group"><h2 class="eyebrow">${g}</h2><div class="cards">` +
+  BOARDS.filter(b => b.group === g).map(b => `<button class="card" data-board="${b.id}"><span class="card-title">${esc(b.title)}</span>` +
+    `<span class="card-meta"><span class="tag sm"><span>${esc(b.tag)}</span></span><span class="card-start">${b.start}</span></span></button>`).join('') +
+  '</div></section>').join('');
+$('groups').addEventListener('click', e => { const c = e.target.closest('[data-board]'); if (c) startGame(c.dataset.board); });
+
+function show(view) {
+  $('hub').hidden = view !== 'hub';
+  $('game').hidden = view !== 'game';
+  scrollTo(0, 0);
+}
+
+/* Game */
+let game, results = [], active = -1;
+
+function startGame(id) {
+  if (mode === 'party' && party.length < 2) {
+    $('partyHint').textContent = 'Add at least 2 players to start a party game.';
+    return $('playerName').focus();
+  }
+  players = mode === 'party' ? party : [solo];
+  const board = BOARDS.find(b => b.id === id), n = players.length, seq = [];
+  for (let r = 0; r < ROUNDS; r++) for (let i = 0; i < n; i++) seq.push({ r, p: r % 2 ? n - 1 - i : i }); // snake order
+  game = { board, pool: POOLS[board.pool], seq, t: 0, cells: players.map(() => []), used: new Set(), over: false };
+  say('');
+  show('game'); clearSearch(); render();
+  $('q').focus();
+}
+
+const left = p => game.board.start - game.cells[p].reduce((s, c) => s + (c && c.kind === 'hit' ? c.value : 0), 0);
+const you = p => players[p] === solo;
+
+function say(text, kind = '') { $('msg').textContent = text; $('msg').className = kind; }
+
+function lockIn(item) {
+  if (game.over || !item) return;
+  if (game.used.has(item.name)) return say(`${item.name} is already taken.`, 'bust');
+  const { p, r } = game.seq[game.t], v = game.board.values.get(item.name) || 0, before = left(p);
+  const kind = !v ? 'miss' : v > before ? 'bust' : 'hit';
+  game.used.add(item.name);
+  game.cells[p][r] = { name: item.name, value: v, kind };
+  say(kind === 'miss' ? `${item.name} isn't on this board. 0.` : kind === 'bust' ? `${item.name} is ${v}. Bust.`
+    : v === before ? `${item.name} is ${v}. Right on 0.` : `${item.name}: ${v}.`, kind);
+  advance();
+}
+
+function advance() {
+  clearSearch();
+  game.t++;
+  while (game.t < game.seq.length && left(game.seq[game.t].p) === 0) { // finished players sit out
+    const { p, r } = game.seq[game.t];
+    game.cells[p][r] = { kind: 'done' };
+    game.t++;
+  }
+  if (game.t >= game.seq.length) finish();
+  render();
+  if (!game.over) $('q').focus();
+}
+
+function finish() {
+  game.over = true;
+  const best = Math.min(...players.map((_, i) => left(i)));
+  game.winners = players.filter((_, i) => left(i) === best);
+  if (players.length > 1) game.winners.forEach(p => p.pts++);
+}
+
+function cell(c, picking) {
+  if (picking) return '<td class="picking">Picking&hellip;</td>';
+  if (!c) return '<td></td>';
+  if (c.kind === 'pass') return '<td class="pass">Pass</td>';
+  if (c.kind === 'done') return '<td class="done">Done</td>';
+  const tail = c.kind === 'hit' ? `&minus;${c.value}` : c.kind === 'bust' ? `Bust &middot; ${c.value}` : '0';
+  return `<td class="${c.kind}"><div><span class="nm" title="${esc(c.name)}">${esc(c.name)}</span><b>${tail}</b></div></td>`;
+}
 
 function render() {
-  $('score').textContent = left();
-  $('darts').textContent = DARTS - state.throws.length;
-  $('log').innerHTML = state.throws.map(([n, v, bust], i) =>
-    `<li><span>${i + 1}. ${n}</span><span class="${bust ? 'bust' : 'hit'}">${bust ? v + ', BUST' : '−' + v}</span></li>`).join('')
-    || '<li class="muted">No darts thrown yet.</li>';
-  $('throw').hidden = $('end').hidden = false;
-  if (!over()) return void ($('end').hidden = true);
-  $('throw').hidden = true;
-  const perfect = left() === 0, mine = state.throws.map(t => t[0]);
-  $('end').className = 'card' + (perfect ? ' win' : '');
-  $('endTitle').textContent = perfect ? 'Perfect game' : `Score: ${left()}`;
-  $('endText').textContent = perfect ? `You hit 0 in ${state.throws.length} darts.` : 'Lowest score wins. Send it and see who got closer.';
-  $('all').innerHTML = [...board].sort((a, b) => b.value - a.value)
-    .map(e => `<li class="${mine.includes(e.name) ? 'mine' : ''}"><span>${e.name}</span><span>${e.value}</span></li>`).join('');
+  const { board, seq, t, cells, over } = game, cur = over ? null : seq[t], multi = players.length > 1;
+  $('meta').textContent = over ? `${board.group} · Final` : `${board.group} · Round ${cur.r + 1} of ${ROUNDS}`;
+  $('title').textContent = board.title;
+  $('tag').textContent = board.tag;
+  $('start').textContent = board.start;
+  $('note').textContent = board.note;
+  $('controls').hidden = over;
+  if (cur) {
+    const name = players[cur.p].name, art = /^[aeiou]/.test(board.thing) ? 'an' : 'a';
+    $('clock').style.setProperty('--c', COLORS[cur.p]);
+    $('clockText').textContent = you(cur.p) ? "You're on the clock" : `${name} is on the clock`;
+    $('q').placeholder = `Search for ${art} ${board.thing}` + (you(cur.p) ? '...' : `, ${name}...`);
+  }
+  $('grid').style.minWidth = `${70 + players.length * 150}px`;
+  $('grid').innerHTML =
+    `<tr><th class="corner rl"></th>${players.map((p, i) => `<th class="ph${cur && cur.p === i ? ' now' : ''}" style="--c:${COLORS[i]}"><div>` +
+      `<span class="av">${esc(p.name[0])}</span><span class="pn">${esc(p.name)}</span>${multi ? `<span class="pts">${p.pts} pts</span>` : ''}</div></th>`).join('')}</tr>` +
+    `<tr class="rem"><th class="rl"></th>${players.map((_, i) => `<td><div><span>Remaining</span><b class="${left(i) === 0 ? 'zero' : ''}">${left(i)}</b></div></td>`).join('')}</tr>` +
+    [...Array(ROUNDS).keys()].map(r => `<tr><th class="rl${cur && cur.r === r ? ' now' : ''}">R${r + 1}</th>` +
+      players.map((_, p) => cell(cells[p][r], cur && cur.r === r && cur.p === p)).join('') + '</tr>').join('');
+
+  $('result').hidden = !over;
+  if (!over) return;
+  const best = left(players.indexOf(game.winners[0])), names = game.winners.map(p => p.name);
+  $('resultTitle').textContent = !multi ? (best === 0 ? (you(0) ? 'Perfect. You hit 0.' : `Perfect. ${names[0]} hit 0.`) : `${you(0) ? 'You' : names[0]} finished on ${best}`)
+    : names.length > 1 ? `Tie on ${best}: ${names.join(' and ')}` : `${names[0]} wins on ${best}`;
+  $('resultText').textContent = multi ? players.map((p, i) => `${p.name} ${left(i)}`).join('  ·  ')
+    : best === 0 ? 'Right on the number. Share it and see if your friends can match it.' : 'Lower is better. Share it and see who gets closer.';
+  $('reveal').innerHTML = [...board.values].sort((a, b) => b[1] - a[1])
+    .map(([n, v]) => `<li class="${game.used.has(n) ? 'used' : ''}"><span>${esc(n)}</span><span>${v}</span></li>`).join('');
 }
 
-$('throw').addEventListener('submit', e => {
+/* Search box: type, arrow to choose, Enter or Lock in to commit. */
+function clearSearch() { $('q').value = ''; results = []; active = -1; renderOpts(); }
+const pickable = i => results[i] && !game.used.has(results[i].name);
+
+function renderOpts() {
+  const q = $('q'), ul = $('opts'), open = q.value.trim() !== '' && document.activeElement === q;
+  ul.hidden = !open;
+  q.setAttribute('aria-expanded', open);
+  ul.innerHTML = results.length ? results.map((it, i) => {
+    const taken = game && game.used.has(it.name);
+    return `<li role="option" id="opt${i}" data-i="${i}" aria-selected="${i === active}"${taken ? ' class="taken" aria-disabled="true"' : ''}>` +
+      `<span>${esc(it.name)}</span>${taken ? '<em>Taken</em>' : ''}</li>`;
+  }).join('') : '<li class="none">No match. Check the spelling.</li>';
+  if (active >= 0) { q.setAttribute('aria-activedescendant', 'opt' + active); $('opt' + active).scrollIntoView({ block: 'nearest' }); }
+  else q.removeAttribute('aria-activedescendant');
+  $('lock').disabled = active < 0;
+}
+
+$('q').addEventListener('input', () => {
+  results = search($('q').value, game.pool);
+  active = results.findIndex((_, i) => pickable(i));
+  renderOpts();
+});
+$('q').addEventListener('focus', renderOpts);
+$('q').addEventListener('blur', () => { $('opts').hidden = true; $('q').setAttribute('aria-expanded', false); });
+$('q').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const step = e.key === 'ArrowDown' ? 1 : -1;
+    for (let i = active + step; i >= 0 && i < results.length; i += step) if (pickable(i)) { active = i; break; }
+    renderOpts();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (active >= 0) lockIn(results[active]); else if ($('q').value.trim()) say('Pick a name from the list.', 'miss');
+  } else if (e.key === 'Escape') { $('opts').hidden = true; $('q').setAttribute('aria-expanded', false); }
+});
+$('opts').addEventListener('mousedown', e => { // choose without losing focus; Lock in commits
   e.preventDefault();
-  if (over()) return;
-  const r = lookup($('guess').value), msg = $('msg');
-  if (Array.isArray(r)) { // free: typos and misses don't cost a dart
-    if (r.length === 1) $('guess').value = r[0].name;
-    msg.textContent = !r.length ? "No match on today's board. Try the full name or check the spelling."
-      : r.length === 1 ? `Did you mean ${r[0].name}? Hit Throw again.`
-      : `Did you mean ${r.slice(0, 3).map(e => e.name).join(', ')}? Type the full name.`;
-    return;
-  }
-  if (state.throws.some(([n]) => n === r.name)) { msg.textContent = `You already threw ${r.name}.`; return; }
-  const bust = r.value > left();
-  state.throws.push([r.name, r.value, bust]);
-  msg.textContent = `${r.name}: ${r.value}.` + (bust ? ' Bust.' : '');
-  $('guess').value = '';
-  save(); render();
+  const li = e.target.closest('[data-i]');
+  if (!li || !pickable(+li.dataset.i)) return;
+  active = +li.dataset.i;
+  $('q').value = results[active].name;
+  renderOpts();
+  $('opts').hidden = true;
+});
+$('lock').addEventListener('click', () => active >= 0 && lockIn(results[active]));
+$('pass').addEventListener('click', () => {
+  const { p, r } = game.seq[game.t];
+  game.cells[p][r] = { kind: 'pass' };
+  say(`${you(p) ? 'You' : players[p].name} passed.`, 'miss');
+  advance();
 });
 
+$('back').addEventListener('click', () => { show('hub'); renderHub(); });
+$('toHub').addEventListener('click', () => { show('hub'); renderHub(); });
+$('again').addEventListener('click', () => startGame(game.board.id));
 $('share').addEventListener('click', async () => {
-  const text = `501 Daily, day ${dayNum}: ${cat.title}\nScore: ${left()}` +
-    (left() === 0 ? ` in ${state.throws.length} darts` : '') + `\n${location.origin}${location.pathname}`;
+  const text = `501: ${game.board.title} (start ${game.board.start})\n` +
+    players.map((p, i) => `${p.name}: ${left(i)}`).join('\n') + `\n${location.origin}${location.pathname}`;
   try {
     if (navigator.share) await navigator.share({ text });
     else { await navigator.clipboard.writeText(text); $('share').textContent = 'Copied'; }
-  } catch (err) { if (err.name !== 'AbortError') prompt('Copy your score:', text); }
+  } catch (err) { if (err.name !== 'AbortError') prompt('Copy your results:', text); }
 });
 
-render();
+renderHub();
 </script>
 </body>
 </html>
