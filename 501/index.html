@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1c2823">
 <title>501</title>
-<meta name="description" content="Name answers and their numbers come off your total. Hit exactly zero in five throws.">
+<meta name="description" content="Daily trivia darts. Name things, their numbers come off your total. Hit exactly zero in five darts.">
+<meta property="og:title" content="501">
+<meta property="og:description" content="Daily trivia darts. Hit exactly zero in five darts.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231c2823'/%3E%3Ccircle cx='16' cy='16' r='11' fill='%23e2525a'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23ecd9a6'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%234cbf7c'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
 /* Pub darts chalkboard: slate board, wood frame, chalk text, dartboard red and green. */
-:root { --slate:#1c2823; --board:#23322b; --line:#36503f; --wood:#7b5638; --wood-dark:#5d3f28;
+:root { --slate:#1c2823; --board:#23322b; --deep:#1a251f; --line:#36503f; --wood:#7b5638; --wood-dark:#5d3f28;
   --chalk:#eef0e6; --dim:#a3b3a8; --sisal:#ecd9a6; --red:#e8585f; --green:#55c483; }
 * { box-sizing:border-box; }
 html { color-scheme:dark; -webkit-text-size-adjust:100%; }
@@ -26,14 +28,31 @@ button { cursor:pointer; }
 
 .top { display:flex; align-items:center; gap:10px; padding:6px 0 18px; }
 .mark { font:800 36px/1 "Big Shoulders Display", Impact, sans-serif; color:var(--sisal); text-decoration:none; }
-.modes { display:flex; margin-left:auto; padding:3px; background:var(--board); border:1px solid var(--line); border-radius:999px; }
-.modes button { border:0; background:none; padding:6px 16px; border-radius:999px; color:var(--dim); font-weight:700; }
-.modes button[aria-selected="true"] { background:var(--chalk); color:var(--slate); }
-.round-btn { width:38px; height:38px; flex:none; border:1px solid var(--line); border-radius:50%; background:none; font-weight:700; }
+.mode { color:var(--dim); font-weight:700; }
+.tools { display:flex; gap:8px; margin-left:auto; }
+.round-btn { width:38px; height:38px; flex:none; display:grid; place-items:center; padding:0; border:1px solid var(--line); border-radius:50%; background:none; font-weight:700; }
+.round-btn svg { width:18px; height:18px; fill:currentColor; }
+.link { padding:0; border:0; background:none; color:var(--chalk); font-weight:700; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px; }
+.side { display:flex; flex-wrap:wrap; gap:8px 22px; margin:18px 0 0; }
 
 .boardno { margin:0; color:var(--dim); font-size:15px; }
 h1 { margin:2px 0 4px; font-size:26px; line-height:1.2; }
 .note { margin:0 0 18px; color:var(--dim); font-size:15px; }
+
+/* Start screen: the board stays hidden until the clock starts */
+.intro { text-align:center; padding-top:6px; }
+.intro .boardno { color:var(--sisal); font-size:18px; font-weight:700; }
+.intro .date { margin:0 0 18px; color:var(--dim); }
+.intro .frame { max-width:300px; margin:0 auto; }
+.slate { padding:16px 10px 10px; background:var(--board); border-radius:5px; }
+.slate span { display:block; color:var(--dim); font-size:15px; }
+.slate .start { font-size:118px; line-height:.95; color:var(--chalk); }
+.rules { max-width:31ch; margin:18px auto 20px; color:var(--dim); }
+.go { width:100%; max-width:300px; padding:16px; font-size:19px; }
+.intro .side { justify-content:center; }
+.vs { max-width:300px; margin:18px auto 0; padding:12px 14px; list-style:none; text-align:left; background:var(--board); border:1px solid var(--line); border-radius:10px; }
+.vs li { display:flex; justify-content:space-between; gap:12px; padding:3px 0; }
+.vs li:first-child { color:var(--dim); font-size:14px; }
 
 /* The chalkboard */
 .frame { padding:7px; background:var(--wood); border-radius:10px; box-shadow:inset 0 0 0 1px var(--wood-dark); }
@@ -90,12 +109,34 @@ tr.next .rn { color:var(--sisal); }
 
 /* End of a board */
 .done { margin-top:18px; padding:18px; background:var(--board); border:1px solid var(--line); border-radius:12px; }
+.done .boardno { margin-bottom:4px; }
 .big { margin:0; font-size:56px; line-height:1; color:var(--sisal); }
 .done p { margin:6px 0 0; }
+.crowd { margin-top:16px; }
+.pct { font-weight:700; }
+.bars { display:flex; align-items:flex-end; gap:6px; height:110px; margin-top:10px; padding-bottom:22px; }
+.bars div { position:relative; flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; }
+.bars i { display:block; background:var(--line); border-radius:3px 3px 0 0; }
+.bars .mine i { background:var(--sisal); }
+.bars span { position:absolute; left:-4px; right:-4px; bottom:-21px; text-align:center; font-size:12px; color:var(--dim); white-space:nowrap; }
+.bars .mine span { color:var(--sisal); font-weight:700; }
 .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
-.standings { margin:10px 0 0; padding:0; list-style:none; }
-.standings li { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); }
-details { margin-top:16px; }
+.name-row { margin-top:16px; }
+.next-in { color:var(--dim); }
+.next-in .num { color:var(--chalk); font-size:21px; letter-spacing:.02em; }
+.standings { margin:12px 0 0; padding:0; list-style:none; }
+.standings li { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+.standings li.me { color:var(--sisal); font-weight:700; }
+.tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:18px; text-align:center; font-size:13px; color:var(--dim); line-height:1.25; }
+.tiles .num { display:block; font-size:34px; line-height:1.1; color:var(--chalk); }
+.dist-title { margin:16px 0 6px; color:var(--dim); font-size:14px; }
+.dist { display:grid; gap:5px; margin:0; padding:0; list-style:none; }
+.dist li { display:grid; grid-template-columns:62px 1fr 26px; gap:8px; align-items:center; font-size:14px; }
+.dist .bar { height:14px; background:var(--deep); border-radius:3px; overflow:hidden; }
+.dist .bar i { display:block; height:100%; background:var(--line); }
+.dist li.now .bar i { background:var(--green); }
+.dist .num { font-size:16px; text-align:right; }
+details { margin-top:18px; }
 summary { cursor:pointer; color:var(--dim); }
 .list { margin:8px 0 0; padding:0 6px 0 0; list-style:none; max-height:300px; overflow-y:auto; }
 .list li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--line); font-size:15px; }
@@ -112,29 +153,41 @@ label { display:grid; gap:6px; color:var(--dim); font-size:15px; }
 .who li { padding:8px 0; border-bottom:1px solid var(--line); font-weight:700; }
 .who li span { color:var(--dim); font-weight:400; }
 
-dialog { max-width:420px; padding:22px; color:var(--chalk); background:var(--board); border:1px solid var(--line); border-radius:14px; }
+dialog { max-width:420px; width:calc(100% - 32px); padding:22px; color:var(--chalk); background:var(--board); border:1px solid var(--line); border-radius:14px; }
 dialog::backdrop { background:rgba(0,0,0,.55); }
 dialog h2 { margin:0 0 10px; font-size:22px; }
 dialog ul { margin:0 0 18px; padding-left:20px; }
 dialog li { margin:6px 0; }
+dialog .tiles { margin-top:4px; }
+dialog form { margin-top:18px; }
 .toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); padding:10px 18px; background:var(--chalk); color:var(--slate); border-radius:999px; font-weight:700; }
 .foot { margin-top:28px; color:var(--dim); font-size:13px; }
-@media (max-width:420px) { .togo.now { font-size:38px; } .big { font-size:48px; } }
+@media (max-width:420px) { .togo.now { font-size:38px; } .big { font-size:48px; } .slate .start { font-size:100px; } .tiles .num { font-size:30px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <a class="mark num" href="./" aria-label="501, new board">501</a>
-    <div class="modes" role="tablist" aria-label="Mode">
-      <button role="tab" id="tabSolo" aria-selected="true">Solo</button>
-      <button role="tab" id="tabParty" aria-selected="false">Party</button>
+    <a class="mark num" href="./" aria-label="501, today's board">501</a>
+    <span class="mode" id="modeTag"></span>
+    <div class="tools">
+      <button class="round-btn" id="statsOpen" aria-label="Your stats"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="9" width="4" height="8" rx="1"/><rect x="7" y="2" width="4" height="15" rx="1"/><rect x="13" y="6" width="4" height="11" rx="1"/></svg></button>
+      <button class="round-btn" id="helpOpen" aria-label="How to play">?</button>
     </div>
-    <button class="round-btn" id="helpOpen" aria-label="How to play">?</button>
   </header>
 
   <main>
-    <section id="play">
+    <section class="intro" id="intro" hidden>
+      <p class="boardno" id="introNo"></p>
+      <p class="date" id="introDate"></p>
+      <div class="frame"><div class="slate"><span>Start at</span><span class="start num" id="introStart"></span></div></div>
+      <ul class="vs" id="vs" hidden></ul>
+      <p class="rules">Five darts, 25 seconds each. The board shows when you start.</p>
+      <button class="btn primary go" id="goBtn">Start</button>
+      <p class="side" id="introSide"></p>
+    </section>
+
+    <section id="play" hidden>
       <p class="boardno" id="boardNo"></p>
       <h1 id="title"></h1>
       <p class="note" id="note"></p>
@@ -152,13 +205,24 @@ dialog li { margin:6px 0; }
       <p class="say" id="say" role="status"></p>
 
       <section class="done" id="done" hidden>
+        <p class="boardno" id="doneNo"></p>
         <p class="big num" id="doneBig"></p>
         <p id="doneText"></p>
+        <div class="crowd" id="crowd" hidden>
+          <p class="pct" id="pct"></p>
+          <div class="bars" id="bars" aria-hidden="true"></div>
+        </div>
         <ol class="standings" id="standings" hidden></ol>
+        <label class="name-row" id="nameRow" hidden>Your name, so friends know whose score it is
+          <input class="field" id="shareName" maxlength="14" autocomplete="nickname">
+        </label>
         <div class="actions">
           <button class="btn primary" id="shareBtn">Share</button>
           <button class="btn" id="nextBtn">New board</button>
         </div>
+        <p class="next-in" id="nextIn" hidden>Next board in <span class="num" id="countdown"></span></p>
+        <div id="statsBox"></div>
+        <p class="side" id="doneSide"></p>
         <details><summary id="allSum"></summary><ol class="list" id="allList"></ol></details>
       </section>
     </section>
@@ -166,7 +230,7 @@ dialog li { margin:6px 0; }
     <section id="partyMenu" hidden>
       <div class="panel">
         <h1>Party</h1>
-        <p class="note">Everyone plays on their own phone. Take turns at the same board, 25 seconds a throw.</p>
+        <p class="note">Everyone plays on their own phone. Take turns at the same board, 25 seconds a dart.</p>
         <div class="stack">
           <label>Your name<input class="field" id="myName" maxlength="14" autocomplete="nickname"></label>
           <button class="btn primary" id="hostBtn">Host a room</button>
@@ -177,6 +241,7 @@ dialog li { margin:6px 0; }
         </div>
         <p class="say miss" id="partySay" role="status"></p>
       </div>
+      <p class="side"><a class="link" href="./">Back to today's board</a></p>
     </section>
 
     <section id="lobby" hidden>
@@ -200,20 +265,33 @@ dialog li { margin:6px 0; }
   <h2>How to play</h2>
   <ul>
     <li>Name something that fits the board. Its number comes off your total.</li>
-    <li>Land on exactly 0. Go under and it's a bust.</li>
-    <li>Five throws, 25 seconds each. Lowest total wins.</li>
+    <li>Land on exactly 0. Overshoot and that dart busts.</li>
+    <li>Five darts, 25 seconds each. A new board every day.</li>
   </ul>
-  <form method="dialog"><button class="btn primary">Play</button></form>
+  <form method="dialog"><button class="btn primary">Got it</button></form>
+</dialog>
+<dialog id="statsDlg">
+  <h2>Your daily stats</h2>
+  <div id="statsBody"></div>
+  <form method="dialog"><button class="btn">Close</button></form>
 </dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="boards.js"></script>
 <script>
 const TURN = 25000, ROUNDS = 5, RING = 106.8;
+const LAUNCH = Date.UTC(2026, 10, 11); // board #1 is Nov 11, 2026, in each player's own time zone
+const DB = ''; // Firebase Realtime Database URL. Percentiles stay hidden until it's set.
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
 const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+const load = k => { try { return JSON.parse(store.get(k)); } catch { return null; } };
+const HOME = new URL('./', location.href.split(/[?#]/)[0]); // the /501/ folder
+const short = u => String(u).replace(/^https?:\/\/(www\.)?/, '');
+const dayOf = t => Math.max(1, Math.round((Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) - LAUNCH) / 864e5) + 1);
+const DAY = dayOf(new Date());
+const dailyBoard = d => (d - 1) % BOARDS.length + 1;
 
 /* ---------- Boards and answers ---------- */
 // data is "value:Name~Name|value:Name". Parsed only for boards in play.
@@ -288,6 +366,7 @@ function newGame(n, players) {
   return { n, players, seq, t: 0, cells: players.map(() => []), used: [], over: false };
 }
 const toGo = (g, p) => board(g.n).start - g.cells[p].reduce((s, c) => s + (c && c.k === 'hit' ? c.v : 0), 0);
+const darts = () => game.cells[0].filter(c => c && c.k !== 'done').length;
 function play(g, name) { // name null means the clock ran out
   const [r, p] = g.seq[g.t], b = board(g.n), before = toGo(g, p);
   let c = { k: 'time' };
@@ -308,31 +387,64 @@ function standings(g) {
 }
 
 /* ---------- State ---------- */
-let mode = 'solo', game = null, me = 0, deadline = null, net = null, lastT = -1;
-const randomBoard = () => { let n; do n = 1 + Math.floor(Math.random() * BOARDS.length); while (BOARDS.length > 1 && game && n === game.n); return n; };
+// ctx.kind is 'daily', 'random' (friends' scores ride in the link) or 'party'.
+let ctx = { kind: 'daily', friends: [] }, mode = 'solo', game = null, me = 0, deadline = null, net = null, lastT = -1, crowd = null;
+function randomBoard() { // skips this week's daily boards and boards you've played
+  const all = BOARDS.map((_, i) => i + 1), soon = new Set([0, 1, 2, 3, 4, 5, 6].map(i => dailyBoard(DAY + i)));
+  const ok = all.filter(n => !soon.has(n) && (!game || n !== game.n));
+  const fresh = ok.filter(n => !store.get('501-board-' + n));
+  const pick = fresh.length ? fresh : ok;
+  return pick[Math.floor(Math.random() * pick.length)];
+}
 const myTurn = () => game && !game.over && game.seq[game.t][1] === me;
+const saveKey = () => ctx.kind === 'daily' ? '501-day-' + DAY : '501-board-' + game.n;
+const save = () => { if (ctx.kind !== 'party') store.set(saveKey(), JSON.stringify({ g: game, dl: deadline })); };
+const label = () => mode === 'party' ? `Party board ${game.n}` : ctx.kind === 'daily' ? `Board #${DAY}` : `Random board ${game.n}`;
 
 function show(view) {
-  $('play').hidden = view !== 'play';
-  $('partyMenu').hidden = view !== 'partyMenu';
-  $('lobby').hidden = view !== 'lobby';
-  $('tabSolo').setAttribute('aria-selected', mode === 'solo');
-  $('tabParty').setAttribute('aria-selected', mode === 'party');
+  for (const v of ['intro', 'play', 'partyMenu', 'lobby']) $(v).hidden = v !== view;
+  $('modeTag').textContent = mode === 'party' ? 'Party' : ctx.kind === 'random' ? 'Random' : 'Daily';
 }
+const sideLinks = () => (ctx.kind === 'daily' ? '<a class="link" href="./?random">Random boards</a>' : `<a class="link" href="./">Today's board</a>`) +
+  '<button class="link" data-party>Party</button>';
 
-function startSolo(n) {
+// Opens a daily or random board: the start screen, the game in progress, or your finished result.
+function openBoard(kind, n, friends = []) {
   leaveRoom();
-  mode = 'solo'; me = 0; deadline = null; lastT = -1;
-  game = newGame(n, [{ id: 'me', name: 'You' }]);
-  history.replaceState(null, '', '#' + n);
-  say(''); show('play'); render();
+  mode = 'solo'; me = 0; lastT = -1; crowd = null;
+  ctx = { kind, friends };
+  const saved = load(kind === 'daily' ? '501-day-' + DAY : '501-board-' + n);
+  say('');
+  if (saved && saved.g && saved.g.n === n && saved.g.players.length === 1) {
+    game = saved.g; deadline = saved.dl;
+    if (!game.over && (!deadline || Date.now() > deadline)) { // you left mid-dart: that dart timed out
+      if (deadline) play(game, null);
+      deadline = game.over ? null : Date.now() + TURN;
+      save();
+    }
+    show('play'); render();
+    if (game.over) finish(); else $('q').focus();
+    return;
+  }
+  game = newGame(n, [{ id: 'me', name: 'You' }]); deadline = null;
+  const b = board(n);
+  document.title = `${label()} | 501`;
+  $('introNo').textContent = label();
+  $('introDate').textContent = kind === 'daily' ? new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : 'Same board for everyone with this link.';
+  $('introStart').textContent = b.start;
+  $('vs').hidden = !friends.length;
+  $('vs').innerHTML = '<li>To beat</li>' + friends.map(f => `<li><span>${esc(f.name)}</span><span class="num">${f.left === 0 ? `out in ${f.darts}` : `${f.left} left`}</span></li>`).join('');
+  $('goBtn').textContent = kind === 'daily' ? "Play today's board" : 'Start';
+  $('introSide').innerHTML = sideLinks();
+  show('intro');
 }
+$('goBtn').addEventListener('click', () => { deadline = Date.now() + TURN; save(); show('play'); render(); $('q').focus(); });
 
 /* ---------- Rendering ---------- */
 function render() {
   const b = board(game.n), solo = game.players.length === 1;
-  document.title = `Board ${game.n} | 501`;
-  $('boardNo').textContent = `Board ${game.n}`;
+  document.title = `${label()} | 501`;
+  $('boardNo').textContent = label();
   $('title').textContent = b.title;
   $('note').textContent = b.note;
   $('sheet').innerHTML = solo ? soloSheet(b) : partySheet(b);
@@ -352,17 +464,17 @@ function soloSheet(b) {
   for (let r = 0; r < ROUNDS; r++) {
     const c = cells[r];
     if (!c || c.k === 'done') {
-      html += `<tr class="${r === next ? 'next' : ''}"><th class="rn num" scope="row">${r + 1}</th><td class="wait" colspan="3">${r === next ? 'Your throw' : ''}</td></tr>`;
+      html += `<tr class="${r === next ? 'next' : ''}"><th class="rn num" scope="row">${r + 1}</th><td class="wait" colspan="3">${r === next ? 'Your dart' : ''}</td></tr>`;
       continue;
     }
     if (c.k === 'hit') left -= c.v;
     const sc = c.k === 'hit' ? c.v : c.k === 'bust' ? 'Bust' : c.k === 'time' ? 'Time' : '0';
-    const sub = c.k === 'time' ? 'Ran out of time' : c.k === 'miss' ? 'Not on this board' : `#${c.rank} of ${b.size}${c.k === 'bust' ? `, worth ${c.v}` : ''}`;
+    const sub = c.k === 'time' ? 'Ran out of time' : c.k === 'miss' ? (b.values.has(c.name) ? 'Worth 0 here' : 'Not on this board') : `#${c.rank} of ${b.size}${c.k === 'bust' ? `, worth ${c.v}` : ''}`;
     html += `<tr class="${c.k}${r === lastIdx ? ' fresh' : ''}"><th class="rn num" scope="row">${r + 1}</th>` +
-      `<td><span class="ans">${c.name ? esc(c.name) : 'No throw'}</span><span class="rank">${sub}</span></td>` +
+      `<td><span class="ans">${c.name ? esc(c.name) : 'No answer'}</span><span class="rank">${sub}</span></td>` +
       `<td class="r"><span class="sc num">${sc}</span></td><td class="r"><span class="togo num${r === lastIdx ? ' now' : ''}">${left}</span></td></tr>`;
   }
-  return `<table class="sheet"><thead><tr><th class="rn"><span hidden>Throw</span></th><th>Answer</th><th class="r">Scored</th><th class="r">To go</th></tr></thead>` +
+  return `<table class="sheet"><thead><tr><th class="rn"><span hidden>Dart</span></th><th>Answer</th><th class="r">Scored</th><th class="r">To go</th></tr></thead>` +
     `<tbody><tr><th class="rn" scope="row"></th><td class="wait">Start</td><td></td><td class="r"><span class="togo num${lastIdx < 0 ? ' now' : ''}">${b.start}</span></td></tr>${html}</tbody></table>`;
 }
 
@@ -383,20 +495,29 @@ function partySheet(b) {
 function renderDone(b) {
   $('done').hidden = !game.over;
   if (!game.over) return;
-  const solo = game.players.length === 1;
+  const solo = game.players.length === 1, k = mode === 'party' ? 'party' : ctx.kind;
+  $('doneNo').textContent = label();
   if (solo) {
-    const left = toGo(game, 0), thrown = game.cells[0].filter(c => c && c.k !== 'done').length;
+    const left = toGo(game, 0);
     $('doneBig').textContent = left === 0 ? 'Checked out' : `${left} left`;
-    $('doneText').textContent = left === 0 ? `You hit 0 in ${thrown} throw${thrown > 1 ? 's' : ''}.` : 'Lowest total wins. Send it and see who gets closer.';
-    $('standings').hidden = true;
+    $('doneText').textContent = left === 0 ? `In ${darts()} darts.` : k === 'random' ? 'Lowest total wins.' : '';
   } else {
     const s = standings(game), winners = s.filter(x => x.place === 1);
     $('doneBig').textContent = winners.length > 1 ? 'Tie' : `${winners[0].name} wins`;
     $('doneText').textContent = winners[0].left === 0 ? 'Checked out on 0.' : `Closest to 0 with ${winners[0].left} left.`;
-    $('standings').hidden = false;
-    $('standings').innerHTML = s.map(x => `<li><span>${x.place}. ${esc(x.name)}</span><span class="num">${x.left}</span></li>`).join('');
   }
-  $('nextBtn').hidden = mode === 'party' && !(net && net.role === 'host');
+  $('nameRow').hidden = k !== 'random';
+  if (k === 'random' && !$('shareName').value) $('shareName').value = store.get('501-name') || '';
+  const rows = k === 'party' ? standings(game).map(x => ({ ...x, me: false })) : k === 'random' ? leaderboard() : null;
+  $('standings').hidden = !rows;
+  if (rows) $('standings').innerHTML = rows.map(x => `<li class="${x.me ? 'me' : ''}"><span>${x.place}. ${esc(x.name)}</span><span class="num">${x.left === 0 && x.darts ? `0 in ${x.darts}` : x.left}</span></li>`).join('');
+  $('shareBtn').textContent = k === 'random' ? 'Send to friends' : 'Share';
+  $('nextBtn').hidden = !(k === 'random' || (k === 'party' && net && net.role === 'host'));
+  $('nextIn').hidden = k !== 'daily';
+  $('statsBox').innerHTML = k === 'daily' ? statsHTML() : '';
+  $('doneSide').hidden = k === 'party';
+  $('doneSide').innerHTML = sideLinks();
+  renderCrowd();
   $('allSum').textContent = `All ${b.size} answers`;
   $('allList').innerHTML = [...b.values].filter(x => x[1] > 0).sort((x, y) => y[1] - x[1])
     .map(([n, v], i) => `<li class="${game.used.includes(n) ? 'mine' : ''}"><span>${i + 1}. ${esc(n)}</span><span class="num">${v}</span></li>`).join('');
@@ -406,18 +527,25 @@ function say(text, kind = '') { $('say').textContent = text; $('say').className 
 function feedback(c, who) {
   const b = board(game.n), name = who ? `${who}: ` : '';
   if (c.k === 'time') return say(`${name}Time's up. No score.`, 'miss');
-  if (c.k === 'miss') return say(`${name}${c.name} isn't on this board. No score.`, 'miss');
+  if (c.k === 'miss') return say(`${name}${c.name} ${b.values.has(c.name) ? 'is worth 0 here' : "isn't on this board"}. No score.`, 'miss');
   if (c.k === 'bust') return say(`${name}${c.name} is ${c.v}. Bust, only ${c.before} to go.`, 'bust');
   say(`${name}${c.name}: ${c.v}, #${c.rank} of ${b.size}.${c.v === c.before ? ' Checked out!' : ''}`, 'hit');
 }
 
 /* ---------- Clock ---------- */
+const untilMidnight = () => {
+  const t = new Date(), s = Math.max(0, Math.floor((new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1) - t) / 1000));
+  return [s / 3600, s / 60 % 60, s % 60].map(x => String(Math.floor(x)).padStart(2, '0')).join(':');
+};
 function tick() {
-  const ms = deadline ? Math.max(0, deadline - Date.now()) : TURN, live = game && !game.over;
+  if (!game) return;
+  const ms = deadline ? Math.max(0, deadline - Date.now()) : TURN;
   $('secs').textContent = Math.ceil(ms / 1000);
   $('sweep').style.strokeDashoffset = RING * (1 - ms / TURN);
   $('clock').classList.toggle('low', !!deadline && ms <= 5000);
-  if (!live || !deadline || ms > 0) return;
+  if (!$('nextIn').hidden) $('countdown').textContent = untilMidnight();
+  if (mode === 'solo' && ctx.kind === 'daily' && dayOf(new Date()) !== DAY && (game.over || !deadline)) return location.reload(); // midnight: next board
+  if (game.over || !deadline || ms > 0) return;
   if (mode === 'solo') { deadline = null; feedback(play(game, null)); afterSolo(); }
   else if (net && net.role === 'host') hostPlay(null, game.seq[game.t][1]);
 }
@@ -426,13 +554,13 @@ setInterval(tick, 200);
 /* ---------- Solo play ---------- */
 function afterSolo() {
   deadline = game.over ? null : Date.now() + TURN;
+  save();
   $('q').value = ''; $('guess').textContent = '';
   render();
-  if (!game.over) $('q').focus();
+  if (game.over) finish(); else $('q').focus();
 }
 let guess = null;
 $('q').addEventListener('input', () => {
-  if (mode === 'solo' && !deadline && !game.over) deadline = Date.now() + TURN; // the clock starts when you start typing
   guess = bestGuess($('q').value, pool(board(game.n).pool));
   const typed = norm($('q').value);
   $('guess').innerHTML = guess ? (norm(guess.name) === typed ? '' : `Best match: <b>${esc(guess.name)}</b>`) : typed.length >= 3 ? 'No match yet' : '';
@@ -449,17 +577,105 @@ $('throwForm').addEventListener('submit', e => {
   else { net.conn.send({ t: 'throw', name }); $('q').value = ''; $('guess').textContent = ''; }
 });
 
-/* ---------- Sharing ---------- */
-function shareText() {
-  const b = board(game.n), url = `${location.origin}${location.pathname}#${game.n}`;
-  if (game.players.length === 1) {
-    const cells = game.cells[0].filter(c => c && c.k !== 'done'), left = toGo(game, 0);
-    const marks = cells.map(c => c.k === 'hit' ? `🟩#${c.rank}` : c.k === 'bust' ? '🟥' : '⬜').join(' ');
-    return `501 #${game.n} ${b.emoji} ${b.title}\n${marks}\n${left === 0 ? `🎯 Checked out in ${cells.length}` : `${left} left`}\n${url}`;
+/* ---------- Results: stats, percentile, friends ---------- */
+function finish() {
+  if (ctx.kind === 'daily') {
+    const h = load('501-hist') || {};
+    if (!h[DAY]) { h[DAY] = { l: toGo(game, 0), d: darts() }; store.set('501-hist', JSON.stringify(h)); $('statsBox').innerHTML = statsHTML(); }
   }
-  const medal = ['🥇', '🥈', '🥉'];
-  const lines = standings(game).map(x => `${medal[x.place - 1] || x.place + '.'} ${x.name} ${x.left}${x.left === 0 ? ' 🎯' : ''}`);
-  return `501 party #${game.n} ${b.emoji} ${b.title}\n${lines.join('\n')}\n${url}`;
+  tally();
+}
+
+function statsHTML() {
+  const h = load('501-hist') || {}, days = Object.keys(h).map(Number).sort((a, b) => a - b), outs = days.filter(d => h[d].l === 0);
+  let streak = 0;
+  for (let d = h[DAY] ? DAY : DAY - 1; h[d]; d--) streak++;
+  let best = 0, run = 0;
+  days.forEach((d, i) => { run = i && days[i - 1] === d - 1 ? run + 1 : 1; best = Math.max(best, run); });
+  const today = h[DAY], rows = [2, 3, 4, 5].map(k => [`${k} darts`, outs.filter(d => h[d].d === k).length, today && today.l === 0 && today.d === k])
+    .concat([['Not out', days.length - outs.length, today && today.l > 0]]);
+  const max = Math.max(1, ...rows.map(r => r[1])), tile = (n, what) => `<div><span class="num">${n}</span>${what}</div>`;
+  return `<div class="tiles">${tile(days.length, 'Played')}${tile(days.length ? Math.round(100 * outs.length / days.length) + '%' : '0%', 'Checked out')}${tile(streak, 'Day streak')}${tile(best, 'Best streak')}</div>` +
+    `<p class="dist-title">How you finished</p><ul class="dist">${rows.map(([what, n, now]) => `<li class="${now ? 'now' : ''}"><span>${what}</span><span class="bar"><i style="width:${n ? Math.max(6, 100 * n / max) : 0}%"></i></span><span class="num">${n}</span></li>`).join('')}</ul>`;
+}
+
+// Everyone's finishing totals, counted per board, so you can see how you did against the field.
+async function tally() {
+  if (!DB || mode === 'party') return;
+  const scope = ctx.kind === 'daily' ? 'd' + DAY : 'r' + game.n, left = toGo(game, 0), sent = '501-sent-' + scope;
+  try {
+    if (!store.get(sent)) {
+      const r = await fetch(`${DB}/h/${scope}/v${left}.json`, { method: 'PUT', body: JSON.stringify({ '.sv': { increment: 1 } }) });
+      if (r.ok) store.set(sent, '1');
+    }
+    const counts = Object.entries(await (await fetch(`${DB}/h/${scope}.json`)).json() || {}).map(([k, n]) => [+k.slice(1), +n]).filter(([v, n]) => v >= 0 && n > 0);
+    const total = counts.reduce((s, [, n]) => s + n, 0), worse = counts.reduce((s, [v, n]) => s + (v > left ? n : 0), 0);
+    crowd = { counts, total, left, pct: total > 1 ? Math.round(100 * worse / (total - 1)) : null };
+  } catch { crowd = null; }
+  if (game.over) renderCrowd();
+}
+function renderCrowd() {
+  $('crowd').hidden = !crowd || mode === 'party';
+  if ($('crowd').hidden) return;
+  const S = board(game.n).start, cuts = [...new Set([0, 1, ...[0.02, 0.05, 0.1, 0.2, 0.4].map(f => Math.max(1, Math.ceil(S * f))), S + 1])].sort((a, b) => a - b);
+  const bins = cuts.slice(0, -1).map((lo, i) => ({ lo, hi: cuts[i + 1] - 1, n: 0 }));
+  for (const [v, n] of crowd.counts) { const bin = bins.find(x => v >= x.lo && v <= x.hi); if (bin) bin.n += n; }
+  const max = Math.max(1, ...bins.map(x => x.n));
+  $('pct').textContent = crowd.total < 2 ? "You're the first to finish this board." : `Better than ${crowd.pct}% of ${ctx.kind === 'daily' ? "today's players" : 'players on this board'}.`;
+  $('bars').hidden = crowd.total < 2;
+  $('bars').innerHTML = bins.map(x => `<div class="${crowd.left >= x.lo && crowd.left <= x.hi ? 'mine' : ''}"><i style="height:${x.n ? Math.max(4, 100 * x.n / max) : 1}%"></i><span>${x.lo === x.hi ? x.lo : `${x.lo}-${x.hi}`}</span></div>`).join('');
+}
+
+// Random boards: friends' results travel in the link as #47/Ali.0.3/Sam.12 (name, left, darts if checked out).
+const cleanName = s => String(s).replace(/[./#?&%\\<>]/g, '').trim().slice(0, 14);
+function parseChallenge(hash) {
+  const [num, ...rest] = hash.split('/'), n = +num;
+  if (!(Number.isInteger(n) && n >= 1 && n <= BOARDS.length)) return null;
+  const S = BOARDS[n - 1].start, seen = new Set(), friends = [];
+  for (const e of rest.slice(0, 12)) {
+    const [nm, l, d] = e.split('.');
+    let name;
+    try { name = cleanName(decodeURIComponent(nm)); } catch { continue; }
+    const left = +l, dart = +d;
+    if (!name || seen.has(name.toLowerCase()) || !(Number.isInteger(left) && left >= 0 && left <= S)) continue;
+    seen.add(name.toLowerCase());
+    friends.push({ name, left, darts: left === 0 ? (dart >= 1 && dart <= ROUNDS ? dart : ROUNDS) : 0 });
+  }
+  return { n, friends };
+}
+function leaderboard() {
+  const mine = { name: cleanName($('shareName').value) || 'You', left: toGo(game, 0), darts: toGo(game, 0) === 0 ? darts() : 0, me: true };
+  const all = [...ctx.friends.filter(f => f.name.toLowerCase() !== mine.name.toLowerCase()), mine]
+    .sort((a, b) => a.left - b.left || a.darts - b.darts);
+  all.forEach((e, i) => e.place = i && e.left === all[i - 1].left && e.darts === all[i - 1].darts ? all[i - 1].place : i + 1);
+  return all;
+}
+$('shareName').addEventListener('input', () => { store.set('501-name', cleanName($('shareName').value)); renderDone(board(game.n)); });
+
+/* ---------- Sharing ---------- */
+function marks() {
+  let left = board(game.n).start;
+  return game.cells[0].filter(c => c && c.k !== 'done').map(c => {
+    if (c.k !== 'hit') return c.k === 'bust' ? '🟥' : '⬜';
+    left -= c.v;
+    return left === 0 ? '🎯' : '🟩';
+  }).join('');
+}
+function shareText() {
+  const b = board(game.n), medal = ['🥇', '🥈', '🥉'];
+  if (mode === 'party') {
+    const lines = standings(game).map(x => `${medal[x.place - 1] || x.place + '.'} ${x.name} ${x.left}${x.left === 0 ? ' 🎯' : ''}`);
+    return `501 party: ${b.title} ${b.emoji}\n${lines.join('\n')}\n${short(HOME)}`;
+  }
+  const left = toGo(game, 0), result = left === 0 ? `Checked out in ${darts()} darts` : `${left} left`;
+  if (ctx.kind === 'daily') {
+    const pct = crowd && crowd.total > 1 ? `, better than ${crowd.pct}%` : '';
+    return `501 #${DAY} 🎯\n${result}${pct}\n${marks()}\n\n${short(HOME)}`;
+  }
+  const lb = leaderboard();
+  const link = `${HOME}random/#${game.n}/` + lb.map(e => `${encodeURIComponent(e.name)}.${e.left}${e.left === 0 ? '.' + e.darts : ''}`).join('/');
+  const lines = lb.map(e => `${medal[e.place - 1] || e.place + '.'} ${e.name}: ${e.left === 0 ? `out in ${e.darts}` : `${e.left} left`}`);
+  return `501: ${b.title} ${b.emoji}\n${marks()}\n${lines.join('\n')}\nBeat us: ${link}`;
 }
 let toastTimer;
 function toast(text) { $('toast').textContent = text; $('toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').hidden = true, 2200); }
@@ -469,8 +685,11 @@ async function copyOrShare(text, copied) {
     await navigator.clipboard.writeText(text); toast(copied);
   } catch (e) { if (e.name !== 'AbortError') prompt('Copy this:', text); }
 }
-$('shareBtn').addEventListener('click', () => copyOrShare(shareText(), 'Copied. Paste it to your friends.'));
-$('nextBtn').addEventListener('click', () => mode === 'party' ? hostNewGame() : startSolo(randomBoard()));
+$('shareBtn').addEventListener('click', () => {
+  if (mode !== 'party' && ctx.kind === 'random' && !cleanName($('shareName').value)) { $('shareName').focus(); return toast('Add your name first.'); }
+  copyOrShare(shareText(), mode !== 'party' && ctx.kind === 'random' ? 'Link copied. Send it to your friends.' : 'Copied. Paste it to your friends.');
+});
+$('nextBtn').addEventListener('click', () => mode === 'party' ? hostNewGame() : (location.hash = randomBoard()));
 
 /* ---------- Party rooms (peer to peer, the host's browser runs the game) ---------- */
 const PREFIX = 'ali501-', LETTERS = 'ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -594,22 +813,32 @@ $('hostBtn').addEventListener('click', hostRoom);
 $('joinForm').addEventListener('submit', e => { e.preventDefault(); joinRoom($('joinCode').value); });
 $('startBtn').addEventListener('click', hostNewGame);
 $('leaveBtn').addEventListener('click', () => { leaveRoom(); partyMenu(); });
-$('inviteBtn').addEventListener('click', () => copyOrShare(`Join my 501 room: ${location.origin}${location.pathname}#room=${net.code}`, 'Invite link copied.'));
-$('tabParty').addEventListener('click', () => { if (mode !== 'party') { deadline = null; partyMenu(); } });
-$('tabSolo').addEventListener('click', () => { if (mode !== 'solo') startSolo(randomBoard()); });
+$('inviteBtn').addEventListener('click', () => copyOrShare(`Join my 501 room: ${HOME}#room=${net.code}`, 'Invite link copied.'));
+document.addEventListener('click', e => { if (e.target.closest('[data-party]')) partyMenu(); });
 $('helpOpen').addEventListener('click', () => $('help').showModal());
+$('statsOpen').addEventListener('click', () => { $('statsBody').innerHTML = statsHTML(); $('statsDlg').showModal(); });
 
 /* ---------- Start ---------- */
-$('foot').textContent = `${BOARDS.length} boards. Stats as of ${UPDATED}.`;
-const hash = location.hash.slice(1), room = hash.match(/^room=([A-Za-z]{4})$/);
-if (room) {
-  partyMenu();
-  $('joinCode').value = room[1].toUpperCase();
-  if ($('myName').value) joinRoom(room[1]); else { $('partySay').textContent = 'Add your name, then join.'; $('myName').focus(); }
-} else {
-  startSolo(+hash >= 1 && +hash <= BOARDS.length ? +hash : randomBoard());
-  if (!store.get('501-seen')) { store.set('501-seen', '1'); $('help').showModal(); }
+const RANDOM = new URLSearchParams(location.search).has('random');
+$('foot').textContent = RANDOM ? `${BOARDS.length} boards. Stats as of ${UPDATED}.` : `A new board every day at midnight. Stats as of ${UPDATED}.`;
+function route() {
+  const hash = location.hash.slice(1), room = hash.match(/^room=([A-Za-z]{4})$/);
+  if (room) {
+    partyMenu();
+    $('joinCode').value = room[1].toUpperCase();
+    if ($('myName').value) joinRoom(room[1]); else { $('partySay').textContent = 'Add your name, then join.'; $('myName').focus(); }
+  } else if (RANDOM) {
+    const c = parseChallenge(hash);
+    if (c) openBoard('random', c.n, c.friends); else location.replace('#' + randomBoard());
+  } else if (/^\d+/.test(hash)) {
+    location.replace('./?random#' + hash); // old board links
+  } else {
+    openBoard('daily', dailyBoard(DAY));
+  }
 }
+addEventListener('hashchange', route);
+route();
+if (!store.get('501-seen')) { store.set('501-seen', '1'); $('help').showModal(); }
 </script>
 </body>
 </html>
