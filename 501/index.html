@@ -281,7 +281,8 @@ dialog form { margin-top:18px; }
 <script>
 const TURN = 25000, ROUNDS = 5, RING = 106.8;
 const LAUNCH = Date.UTC(2026, 10, 11); // board #1 is Nov 11, 2026, in each player's own time zone
-const DB = ''; // Firebase Realtime Database URL. Percentiles stay hidden until it's set.
+// Finishing totals per board, for percentiles. Rules allow reading one board's counts and adding exactly 1 to a count.
+const DB = 'https://gen-lang-client-0747460706-default-rtdb.firebaseio.com';
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
