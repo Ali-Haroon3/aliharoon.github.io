@@ -2,204 +2,250 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c2823">
 <title>501</title>
-<meta name="description" content="Stat trivia darts. Name answers, their numbers come off your total, land on exactly zero.">
-<link rel="icon" href="/favicon.svg">
+<meta name="description" content="Name answers and their numbers come off your total. Hit exactly zero in five throws.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231c2823'/%3E%3Ccircle cx='16' cy='16' r='11' fill='%23e2525a'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23ecd9a6'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%234cbf7c'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#0e1a28; --panel:#142438; --panel-2:#1b2f47; --line:#28415e; --text:#e9eff6; --muted:#8fa5bd;
-  --blue:#4aa8e8; --blue-ink:#071f33; --red:#ef5a6f; --green:#43c88a; }
+/* Pub darts chalkboard: slate board, wood frame, chalk text, dartboard red and green. */
+:root { --slate:#1c2823; --board:#23322b; --line:#36503f; --wood:#7b5638; --wood-dark:#5d3f28;
+  --chalk:#eef0e6; --dim:#a3b3a8; --sisal:#ecd9a6; --red:#e8585f; --green:#55c483; }
 * { box-sizing:border-box; }
-html { color-scheme:dark; }
-body { margin:0; background:var(--bg); color:var(--text); font:15px/1.45 Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-main { max-width:1040px; margin:0 auto; padding:24px 16px 72px; }
+html { color-scheme:dark; -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--slate); color:var(--chalk); font:17px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; }
 button, input { font:inherit; color:inherit; }
 button { cursor:pointer; }
-:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+:focus-visible { outline:2px solid var(--sisal); outline-offset:2px; }
 [hidden] { display:none !important; }
-.eyebrow { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0; }
-h1, h2 { margin:0; font-weight:900; text-transform:uppercase; line-height:1.05; }
-.muted { color:var(--muted); }
-.panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; }
-.btn { border:1px solid var(--line); background:var(--panel-2); border-radius:6px; padding:10px 18px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; }
-.btn:hover { border-color:var(--blue); }
-.btn.primary { background:var(--blue); border-color:var(--blue); color:var(--blue-ink); }
-.btn:disabled { opacity:.45; cursor:not-allowed; border-color:var(--line); }
-.tag { display:inline-block; background:var(--blue); color:var(--blue-ink); border-radius:3px; padding:6px 16px; transform:skewX(-12deg);
-  font-weight:800; font-size:13px; letter-spacing:.1em; text-transform:uppercase; }
-.tag > span { display:inline-block; transform:skewX(12deg); }
-.tag.sm { font-size:11px; padding:3px 10px; }
-.av { display:inline-grid; place-items:center; width:30px; height:30px; flex:none; border-radius:50%; border:2px solid var(--c);
-  color:var(--c); font-size:13px; font-weight:800; text-transform:uppercase; }
+.wrap { max-width:560px; margin:0 auto; padding:10px 16px 56px; }
+.num { font-family:"Big Shoulders Display", Impact, sans-serif; font-weight:700; font-variant-numeric:tabular-nums; }
 
-/* Hub */
-.tabs { display:inline-flex; gap:4px; padding:4px; margin-bottom:20px; background:var(--panel); border:1px solid var(--line); border-radius:8px; }
-.tabs button { border:0; background:none; color:var(--muted); padding:8px 20px; border-radius:5px; font-weight:800; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
-.tabs button[aria-selected="true"] { background:var(--blue); color:var(--blue-ink); }
-.hub-head h1 { font-size:clamp(56px, 14vw, 96px); color:var(--blue); letter-spacing:-.02em; margin:4px 0 8px; }
-.lede { max-width:620px; margin:0 0 24px; color:var(--muted); font-size:16px; }
-.lede b { color:var(--text); }
-.players { margin-bottom:28px; }
-#chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
-.chip { display:inline-flex; align-items:center; gap:8px; background:var(--panel-2); border:1px solid var(--line); border-radius:999px; padding:4px 6px 4px 4px; font-weight:600; }
-.chip button { border:0; background:none; color:var(--muted); font-size:18px; line-height:1; padding:2px 6px; }
-.chip button:hover { color:var(--red); }
-.add { display:flex; gap:8px; max-width:420px; }
-.add input, .search input { flex:1; min-width:0; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
-.small { font-size:13px; margin:10px 0 0; }
-.group { margin-bottom:28px; }
-.cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; margin-top:10px; }
-.card { text-align:left; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:12px; }
-.card:hover { border-color:var(--blue); background:var(--panel-2); }
-.card-title { font-weight:800; font-size:16px; }
-.card-meta { display:flex; justify-content:space-between; align-items:center; }
-.card-start { font-weight:900; font-size:22px; color:var(--blue); font-variant-numeric:tabular-nums; }
+.top { display:flex; align-items:center; gap:10px; padding:6px 0 18px; }
+.mark { font:800 36px/1 "Big Shoulders Display", Impact, sans-serif; color:var(--sisal); text-decoration:none; }
+.modes { display:flex; margin-left:auto; padding:3px; background:var(--board); border:1px solid var(--line); border-radius:999px; }
+.modes button { border:0; background:none; padding:6px 16px; border-radius:999px; color:var(--dim); font-weight:700; }
+.modes button[aria-selected="true"] { background:var(--chalk); color:var(--slate); }
+.round-btn { width:38px; height:38px; flex:none; border:1px solid var(--line); border-radius:50%; background:none; font-weight:700; }
 
-/* Game */
-.back { border:0; background:none; color:var(--muted); padding:0; margin-bottom:16px; font-weight:600; }
-.back:hover { color:var(--text); }
-.game-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
-.game-head h2 { font-size:clamp(24px, 5vw, 40px); margin:6px 0 12px; }
-.start { text-align:right; }
-#start { font-weight:900; font-size:clamp(56px, 12vw, 96px); line-height:.9; color:var(--blue); font-variant-numeric:tabular-nums; }
-.note { margin:16px 0; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:6px; color:var(--muted); font-size:13px; }
-.controls { display:grid; grid-template-columns:auto 1fr auto auto; gap:10px; align-items:stretch; }
-.clock { display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:0 16px;
-  font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:14px; white-space:nowrap; }
-.dot { width:9px; height:9px; border-radius:50%; background:var(--c); }
-.search { position:relative; display:flex; }
-.search input { border:2px solid var(--blue); padding:12px 14px; font-size:16px; }
-#opts { position:absolute; z-index:5; top:calc(100% + 4px); left:0; right:0; margin:0; padding:4px; list-style:none; background:var(--panel-2);
-  border:1px solid var(--line); border-radius:6px; max-height:320px; overflow-y:auto; box-shadow:0 12px 24px rgba(0,0,0,.35); }
-#opts li { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:4px; cursor:pointer; }
-#opts li[aria-selected="true"] { background:var(--blue); color:var(--blue-ink); font-weight:700; }
-#opts li.taken { color:var(--muted); cursor:not-allowed; }
-#opts li em { font-style:normal; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
-#opts li.none { color:var(--muted); cursor:default; }
-#msg { min-height:22px; margin:10px 0 14px; font-weight:600; }
-#msg.bust { color:var(--red); } #msg.hit { color:var(--green); } #msg.miss { color:var(--muted); }
-.grid-wrap { overflow-x:auto; }
-.grid { width:100%; border-collapse:separate; border-spacing:6px; table-layout:fixed; margin:0 -6px; }
-.grid th, .grid td { background:var(--panel); border-radius:4px; padding:12px 14px; text-align:left; height:52px; }
-.grid .corner, .grid .rem th { background:none; }
-.grid th.rl { width:64px; text-align:center; font-weight:800; }
-.grid th.rl.now { color:var(--red); outline:1px solid var(--red); }
-.ph { border-bottom:3px solid var(--c); }
-.ph > div { display:flex; align-items:center; gap:10px; }
-.pn { font-weight:800; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.ph.now .pn { color:var(--c); }
-.pts { margin-left:auto; color:var(--muted); font-weight:600; font-size:13px; white-space:nowrap; }
-.rem td > div { display:flex; justify-content:space-between; align-items:center; }
-.rem span { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:700; }
-.rem b { font-size:20px; font-variant-numeric:tabular-nums; }
-.rem b.zero { color:var(--green); }
-.grid td > div { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-.nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
-.grid td b { white-space:nowrap; font-variant-numeric:tabular-nums; }
-.hit b { color:var(--green); } .bust b { color:var(--red); } .miss b, td.pass, td.done { color:var(--muted); }
-td.picking { outline:1px solid var(--red); text-align:center; color:var(--blue); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:13px; }
-.result { margin-bottom:16px; border-color:var(--blue); }
-.result h3 { margin:0 0 4px; font-size:24px; font-weight:900; text-transform:uppercase; }
-.result p { margin:0 0 14px; color:var(--muted); }
-.row { display:flex; flex-wrap:wrap; gap:8px; }
-.result details { margin-top:14px; }
-.result summary { cursor:pointer; font-weight:700; }
-#reveal { list-style:none; margin:10px 0 0; padding:0 8px 0 0; max-height:320px; overflow-y:auto; }
-#reveal li { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
-#reveal li.used { color:var(--blue); font-weight:700; }
-.rules { margin-top:24px; color:var(--muted); font-size:14px; }
-.rules summary { color:var(--text); font-weight:700; cursor:pointer; }
+.boardno { margin:0; color:var(--dim); font-size:15px; }
+h1 { margin:2px 0 4px; font-size:26px; line-height:1.2; }
+.note { margin:0 0 18px; color:var(--dim); font-size:15px; }
 
-@media (max-width:640px) {
-  .controls { grid-template-columns:1fr 1fr; }
-  .clock, .search { grid-column:1 / -1; }
-  .clock { padding:12px 14px; }
-  .start { text-align:left; }
-  .grid th, .grid td { padding:10px; }
+/* The chalkboard */
+.frame { padding:7px; background:var(--wood); border-radius:10px; box-shadow:inset 0 0 0 1px var(--wood-dark); }
+.board { overflow-x:auto; padding:2px 6px; background:var(--board); border-radius:5px; }
+.sheet { width:100%; border-collapse:collapse; }
+.sheet th, .sheet td { padding:9px 8px; text-align:left; vertical-align:middle; border-bottom:1px solid var(--line); }
+.sheet tbody tr:last-child > * { border-bottom:0; }
+.sheet thead th { font-size:14px; font-weight:400; color:var(--dim); }
+.sheet .r { text-align:right; }
+.rn { width:26px; color:var(--dim); font-weight:400; }
+.ans { display:block; font-weight:700; line-height:1.25; }
+.rank { display:block; font-size:14px; color:var(--dim); }
+.sc { font-size:24px; white-space:nowrap; }
+.hit .sc, .sc.hit { color:var(--green); }
+.bust .sc, .sc.bust { color:var(--red); }
+.miss .sc, .time .sc, .sc.miss { color:var(--dim); }
+.togo { font-size:22px; color:var(--dim); text-decoration:line-through; text-decoration-thickness:2px; white-space:nowrap; }
+.togo.now { font-size:44px; line-height:1; color:var(--sisal); text-decoration:none; }
+tr.next { background:#2a3c33; }
+tr.next .rn { color:var(--sisal); }
+.sheet .wait { color:var(--dim); font-size:15px; }
+/* party sheet: one column per player, what's left pinned on top */
+.party th.pl { text-align:right; font-size:15px; white-space:nowrap; }
+.party th.pl.turn { color:var(--sisal); }
+.party th.pl.turn::after { content:""; display:block; height:3px; margin-top:4px; background:var(--sisal); border-radius:2px; }
+.party .left td { padding-top:4px; padding-bottom:12px; border-bottom:2px solid var(--line); }
+.party .cell { text-align:right; min-width:92px; }
+.party .cell .ans { font-weight:400; font-size:14px; color:var(--dim); max-width:120px; margin-left:auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.party .cell .sc { font-size:21px; }
+@media (prefers-reduced-motion:no-preference) {
+  .fresh { animation:chalk .5s ease-out; }
+  @keyframes chalk { from { opacity:0; transform:translateY(4px); } }
 }
+
+/* Throwing */
+.throw { display:flex; gap:10px; align-items:center; margin-top:18px; }
+.clock { position:relative; width:46px; height:46px; flex:none; }
+.clock svg { width:100%; height:100%; transform:rotate(-90deg); }
+.clock circle { fill:none; stroke-width:4; }
+.clock .track { stroke:var(--line); }
+.clock .sweep { stroke:var(--chalk); stroke-linecap:round; stroke-dasharray:106.8; }
+.clock.low .sweep { stroke:var(--red); }
+.clock span { position:absolute; inset:0; display:grid; place-items:center; font-size:19px; }
+.field { flex:1; min-width:0; padding:12px 14px; background:var(--board); border:2px solid var(--line); border-radius:10px; font-size:17px; }
+.field:focus { border-color:var(--sisal); outline:none; }
+.field:disabled { opacity:.6; }
+.btn { padding:12px 18px; border-radius:10px; font-weight:700; border:1px solid var(--line); background:none; }
+.btn.primary { background:var(--sisal); border-color:var(--sisal); color:var(--slate); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.guess { min-height:26px; margin:8px 0 0 56px; color:var(--dim); font-size:15px; }
+.guess b { color:var(--chalk); }
+.say { min-height:26px; margin:4px 0 0; font-weight:700; }
+.say.hit { color:var(--green); } .say.bust { color:var(--red); } .say.miss { color:var(--dim); }
+
+/* End of a board */
+.done { margin-top:18px; padding:18px; background:var(--board); border:1px solid var(--line); border-radius:12px; }
+.big { margin:0; font-size:56px; line-height:1; color:var(--sisal); }
+.done p { margin:6px 0 0; }
+.actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.standings { margin:10px 0 0; padding:0; list-style:none; }
+.standings li { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); }
+details { margin-top:16px; }
+summary { cursor:pointer; color:var(--dim); }
+.list { margin:8px 0 0; padding:0 6px 0 0; list-style:none; max-height:300px; overflow-y:auto; }
+.list li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--line); font-size:15px; }
+.list li.mine { color:var(--sisal); font-weight:700; }
+
+/* Party rooms */
+.panel { padding:18px; background:var(--board); border:1px solid var(--line); border-radius:12px; }
+.panel h1 { margin-top:0; }
+.stack { display:grid; gap:12px; margin-top:16px; }
+.row { display:flex; gap:10px; }
+label { display:grid; gap:6px; color:var(--dim); font-size:15px; }
+.code { margin:4px 0 8px; font-size:64px; line-height:1; letter-spacing:.08em; color:var(--sisal); }
+.who { margin:14px 0; padding:0; list-style:none; }
+.who li { padding:8px 0; border-bottom:1px solid var(--line); font-weight:700; }
+.who li span { color:var(--dim); font-weight:400; }
+
+dialog { max-width:420px; padding:22px; color:var(--chalk); background:var(--board); border:1px solid var(--line); border-radius:14px; }
+dialog::backdrop { background:rgba(0,0,0,.55); }
+dialog h2 { margin:0 0 10px; font-size:22px; }
+dialog ul { margin:0 0 18px; padding-left:20px; }
+dialog li { margin:6px 0; }
+.toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); padding:10px 18px; background:var(--chalk); color:var(--slate); border-radius:999px; font-weight:700; }
+.foot { margin-top:28px; color:var(--dim); font-size:13px; }
+@media (max-width:420px) { .togo.now { font-size:38px; } .big { font-size:48px; } }
 </style>
 </head>
 <body>
-<main>
-  <section id="hub">
-    <div class="tabs" id="tabs" role="tablist" aria-label="Mode">
-      <button role="tab" id="tab-solo" data-mode="solo" aria-selected="true">Solo</button>
-      <button role="tab" id="tab-party" data-mode="party" aria-selected="false">Party</button>
+<div class="wrap">
+  <header class="top">
+    <a class="mark num" href="./" aria-label="501, new board">501</a>
+    <div class="modes" role="tablist" aria-label="Mode">
+      <button role="tab" id="tabSolo" aria-selected="true">Solo</button>
+      <button role="tab" id="tabParty" aria-selected="false">Party</button>
     </div>
-    <div class="hub-head">
-      <p class="eyebrow">Stat trivia darts</p>
-      <h1>501</h1>
-      <p class="lede">Pick a board and you're in. You start on its <b>starting number</b>. Each round you name one answer and its stat comes off
-        your total. Land on <b>exactly 0</b>. Go under and it's a <b>bust</b>. Five rounds, closest to 0 wins.</p>
-    </div>
-    <div class="panel players" id="partyPanel" hidden>
-      <p class="eyebrow">Party players</p>
-      <div id="chips"></div>
-      <form class="add" id="addPlayer">
-        <input id="playerName" maxlength="14" autocomplete="off" placeholder="Add a player" aria-label="Player name">
-        <button class="btn">Add</button>
+    <button class="round-btn" id="helpOpen" aria-label="How to play">?</button>
+  </header>
+
+  <main>
+    <section id="play">
+      <p class="boardno" id="boardNo"></p>
+      <h1 id="title"></h1>
+      <p class="note" id="note"></p>
+      <div class="frame"><div class="board" id="sheet"></div></div>
+
+      <form class="throw" id="throwForm" autocomplete="off">
+        <div class="clock num" id="clock" aria-hidden="true">
+          <svg viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="17"/><circle class="sweep" id="sweep" cx="20" cy="20" r="17"/></svg>
+          <span id="secs">25</span>
+        </div>
+        <input class="field" id="q" enterkeyhint="go" autocapitalize="words" autocorrect="off" spellcheck="false" aria-label="Your answer" aria-describedby="guess">
+        <button class="btn primary" id="throwBtn">Throw</button>
       </form>
-      <p class="small muted" id="partyHint"></p>
-    </div>
-    <div id="groups"></div>
-  </section>
+      <p class="guess" id="guess" aria-live="polite"></p>
+      <p class="say" id="say" role="status"></p>
 
-  <section id="game" hidden>
-    <button class="back" id="back">&larr; Back to boards</button>
-    <div class="game-head">
-      <div>
-        <p class="eyebrow" id="meta"></p>
-        <h2 id="title"></h2>
-        <span class="tag"><span id="tag"></span></span>
+      <section class="done" id="done" hidden>
+        <p class="big num" id="doneBig"></p>
+        <p id="doneText"></p>
+        <ol class="standings" id="standings" hidden></ol>
+        <div class="actions">
+          <button class="btn primary" id="shareBtn">Share</button>
+          <button class="btn" id="nextBtn">New board</button>
+        </div>
+        <details><summary id="allSum"></summary><ol class="list" id="allList"></ol></details>
+      </section>
+    </section>
+
+    <section id="partyMenu" hidden>
+      <div class="panel">
+        <h1>Party</h1>
+        <p class="note">Everyone plays on their own phone. Take turns at the same board, 25 seconds a throw.</p>
+        <div class="stack">
+          <label>Your name<input class="field" id="myName" maxlength="14" autocomplete="nickname"></label>
+          <button class="btn primary" id="hostBtn">Host a room</button>
+          <form class="row" id="joinForm">
+            <input class="field num" id="joinCode" maxlength="4" autocapitalize="characters" placeholder="Room code" aria-label="Room code">
+            <button class="btn">Join</button>
+          </form>
+        </div>
+        <p class="say miss" id="partySay" role="status"></p>
       </div>
-      <div class="start"><p class="eyebrow">Starting number</p><div id="start"></div></div>
-    </div>
-    <p class="note" id="note"></p>
+    </section>
 
-    <div class="panel result" id="result" hidden>
-      <h3 id="resultTitle"></h3>
-      <p id="resultText"></p>
-      <div class="row">
-        <button class="btn primary" id="again">Play again</button>
-        <button class="btn" id="share">Share results</button>
-        <button class="btn" id="toHub">Another board</button>
+    <section id="lobby" hidden>
+      <div class="panel">
+        <p class="boardno">Room code</p>
+        <p class="code num" id="roomCode"></p>
+        <button class="btn" id="inviteBtn">Copy invite link</button>
+        <ul class="who" id="who"></ul>
+        <div class="row">
+          <button class="btn primary" id="startBtn">Start</button>
+          <button class="btn" id="leaveBtn">Leave</button>
+        </div>
+        <p class="say miss" id="lobbySay" role="status"></p>
       </div>
-      <details><summary>Every answer on this board</summary><ol id="reveal"></ol></details>
-    </div>
+    </section>
+  </main>
+  <p class="foot" id="foot"></p>
+</div>
 
-    <div class="controls" id="controls">
-      <div class="clock" id="clock"><span class="dot"></span><span id="clockText"></span></div>
-      <div class="search">
-        <input id="q" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="opts" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Search for an answer">
-        <ul id="opts" role="listbox" hidden></ul>
-      </div>
-      <button class="btn primary" id="lock" disabled>Lock in</button>
-      <button class="btn" id="pass">Pass</button>
-    </div>
-    <p id="msg" role="status"></p>
-    <div class="grid-wrap"><table class="grid" id="grid"></table></div>
-
-    <details class="rules">
-      <summary>Rules</summary>
-      <p>Each answer's number comes off your remaining total. Land on exactly 0 and you're done. If an answer is bigger than what you have left,
-      it's a bust: the pick is wasted and your total stays put. The search box also lists answers from similar boards, and those score 0, so you
-      have to know who actually counts. Once someone picks an answer, nobody else can. Pass skips your pick. Picks snake each round, so last pick
-      in one round goes first in the next.</p>
-    </details>
-  </section>
-</main>
+<dialog id="help">
+  <h2>How to play</h2>
+  <ul>
+    <li>Name something that fits the board. Its number comes off your total.</li>
+    <li>Land on exactly 0. Go under and it's a bust.</li>
+    <li>Five throws, 25 seconds each. Lowest total wins.</li>
+  </ul>
+  <form method="dialog"><button class="btn primary">Play</button></form>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script src="boards.js"></script>
 <script>
-const ROUNDS = 5, MAX_PLAYERS = 6;
-const COLORS = ['#ef5a6f', '#4aa8e8', '#e9eff6', '#43c88a', '#f2b84b', '#b38cf5'];
+const TURN = 25000, ROUNDS = 5, RING = 106.8;
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
-const lev = (a, b) => { // edit distance counting a swapped pair as one typo, for autocorrect
+const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+
+/* ---------- Boards and answers ---------- */
+// data is "value:Name~Name|value:Name". Parsed only for boards in play.
+function board(n) {
+  const b = BOARDS[n - 1];
+  if (!b.values) {
+    b.values = new Map(b.data.split('|').flatMap(s => { const i = s.indexOf(':'); return s.slice(i + 1).split('~').map(x => [x, +s.slice(0, i)]); }));
+    b.sorted = [...b.values.values()].filter(v => v > 0).sort((x, y) => y - x); // zero rows are known answers that score nothing
+    b.size = b.sorted.length;
+  }
+  return b;
+}
+const rankOf = (b, v) => 1 + b.sorted.findIndex(x => x <= v);
+// Every board in a pool shares one answer list, so a name being recognised says nothing about this board.
+const POOLS = {};
+const term = s => ({ key: norm(s), words: s.split(/[\s.'\-\/]+/).map(norm).filter(Boolean) });
+function pool(name) {
+  if (!POOLS[name]) {
+    const names = new Set();
+    BOARDS.forEach((b, i) => { if (b.pool === name) for (const x of board(i + 1).values.keys()) names.add(x); });
+    const items = POOLS[name] = [...names].map(n => ({ name: n, terms: [n, ...(ALIASES[n] || '').split('|').filter(Boolean)].map(term) }));
+    items.byFirst = new Map(); // typo search only scans names with a word starting with the same letter
+    for (const it of items) for (const ch of new Set(it.terms.flatMap(t => [t.key[0], ...t.words.map(w => w[0])]))) {
+      if (!items.byFirst.has(ch)) items.byFirst.set(ch, []);
+      items.byFirst.get(ch).push(it);
+    }
+  }
+  return POOLS[name];
+}
+
+/* ---------- Autocorrect: one best guess, never a list ---------- */
+const lev = (a, b) => { // edit distance; a swapped pair counts as one typo
   let pp = [], prev = [...Array(b.length + 1).keys()];
   for (let i = 1; i <= a.length; i++) {
     const cur = [i];
@@ -211,248 +257,359 @@ const lev = (a, b) => { // edit distance counting a swapped pair as one typo, fo
   }
   return prev[b.length];
 };
-
-// Boards share a search pool with similar boards, so the dropdown never tells you who is on this one.
-const POOLS = {};
-for (const b of BOARDS) {
-  b.values = new Map(b.data.split('|').flatMap(s => { const i = s.indexOf(':'); return s.slice(i + 1).split(',').map(n => [n, +s.slice(0, i)]); }));
-  for (const n of b.values.keys()) (POOLS[b.pool] ??= new Set()).add(n);
-}
-const term = s => ({ key: norm(s), words: s.split(/[\s.'-]+/).map(norm).filter(Boolean) });
-for (const k in POOLS) POOLS[k] = [...POOLS[k]].map(name => ({ name, terms: [name, ...(ALIASES[name] || '').split('|').filter(Boolean)].map(term) }));
-
-// Lower is a better match: exact, words started, inside a word, then typos (last-name typos first).
-function rank(t, q, qw, tol) {
-  if (t.key === q) return 0;
-  if (qw.every(w => t.words.some(x => x.startsWith(w)))) return 1;
-  if (t.words.some(x => x.includes(q))) return 2;
-  let s = t.key.startsWith(q) ? 3.5 : Infinity; // runs across words, like "aaronrod"
-  if (!tol) return s;
+// Lower is a better match: exact 0, every word started 1, inside a word 2, typos 3+ (last-name typos first), run across words 3.5.
+const quick = (t, q, qw) => t.key === q ? 0 : qw.every(w => t.words.some(x => x.startsWith(w))) ? 1
+  : t.words.some(x => x.includes(q)) ? 2 : t.key.startsWith(q) ? 3.5 : Infinity;
+function typo(t, q, tol) {
+  let s = Infinity;
   t.words.forEach((w, i) => {
-    const d = Math.min(lev(q, w), lev(q, w.slice(0, q.length)));
+    if (w[0] !== q[0]) return; // typos rarely hit the first letter, and skipping these keeps big pools fast
+    const d = Math.min(Math.abs(w.length - q.length) <= tol ? lev(q, w) : tol + 1, lev(q, w.slice(0, q.length)));
     if (d <= tol) s = Math.min(s, (i === t.words.length - 1 ? 2 : 2.5) + d);
   });
-  const d = lev(q, t.key.slice(0, q.length));
-  return d <= tol ? Math.min(s, 3.5 + d) : s;
+  if (t.key[0] === q[0]) { const d = lev(q, t.key.slice(0, q.length)); if (d <= tol) s = Math.min(s, 3.5 + d); }
+  return s;
 }
-function search(text, pool) {
-  const q = norm(text), qw = text.split(/[\s.'-]+/).map(norm).filter(Boolean);
-  if (!q) return [];
-  const tol = q.length >= 6 ? 2 : q.length >= 4 ? 1 : 0, hits = [];
-  for (const item of pool) {
-    const s = Math.min(...item.terms.map(t => rank(t, q, qw, tol)));
-    if (s < Infinity) hits.push([s, item]);
+function bestGuess(text, items) {
+  const q = norm(text), qw = text.split(/[\s.'\-\/]+/).map(norm).filter(Boolean);
+  if (!q || (q.length < 3 && !items.some(it => it.terms.some(t => t.key === q)))) return null;
+  const tol = q.length >= 6 ? 2 : q.length >= 4 ? 1 : 0;
+  let top = null, topScore = Infinity;
+  const consider = (it, s) => { if (s < topScore || (s === topScore && top && it.name.length < top.name.length)) { top = it; topScore = s; } };
+  for (const it of items) for (const t of it.terms) consider(it, quick(t, q, qw));
+  if (topScore > 2 && tol) for (const it of items.byFirst.get(q[0]) || []) for (const t of it.terms) consider(it, typo(t, q, tol));
+  return topScore < Infinity ? top : null;
+}
+
+/* ---------- Game rules (plain data, so a party host can send it as is) ---------- */
+function newGame(n, players) {
+  const seq = [];
+  for (let r = 0; r < ROUNDS; r++) for (let i = 0; i < players.length; i++) seq.push([r, r % 2 ? players.length - 1 - i : i]); // snake order
+  return { n, players, seq, t: 0, cells: players.map(() => []), used: [], over: false };
+}
+const toGo = (g, p) => board(g.n).start - g.cells[p].reduce((s, c) => s + (c && c.k === 'hit' ? c.v : 0), 0);
+function play(g, name) { // name null means the clock ran out
+  const [r, p] = g.seq[g.t], b = board(g.n), before = toGo(g, p);
+  let c = { k: 'time' };
+  if (name != null) {
+    const v = b.values.get(name) || 0;
+    c = { k: !v ? 'miss' : v > before ? 'bust' : 'hit', name, v, rank: v ? rankOf(b, v) : 0 };
+    g.used.push(name);
   }
-  return hits.sort((a, b) => a[0] - b[0] || a[1].name.length - b[1].name.length || a[1].name.localeCompare(b[1].name)).slice(0, 8).map(h => h[1]);
+  g.cells[p][r] = c;
+  for (g.t++; g.t < g.seq.length && toGo(g, g.seq[g.t][1]) === 0; g.t++) g.cells[g.seq[g.t][1]][g.seq[g.t][0]] = { k: 'done' };
+  g.over = g.t >= g.seq.length;
+  return { ...c, p, before };
+}
+function standings(g) {
+  const s = g.players.map((pl, i) => ({ name: pl.name, left: toGo(g, i) })).sort((a, b) => a.left - b.left);
+  s.forEach((x, i) => x.place = i && x.left === s[i - 1].left ? s[i - 1].place : i + 1);
+  return s;
 }
 
-/* Players: solo by default. Party mode is pass-the-phone with 2 to 6 names. */
-const solo = { name: 'You', pts: 0 }, HINT = 'Add 2 to 6 players, then pick a board. Pass the phone around. Picks snake each round.';
-let mode = 'solo', party = [], players = [solo];
-try { const saved = JSON.parse(localStorage.getItem('501-party')); if (Array.isArray(saved)) party = saved.slice(0, MAX_PLAYERS).map(name => ({ name: String(name).slice(0, 14) || '?', pts: 0 })); } catch {}
-const saveParty = () => { try { localStorage.setItem('501-party', JSON.stringify(party.map(p => p.name))); } catch {} };
-
-function renderHub() {
-  $('tab-solo').setAttribute('aria-selected', mode === 'solo');
-  $('tab-party').setAttribute('aria-selected', mode === 'party');
-  $('partyPanel').hidden = mode !== 'party';
-  $('chips').innerHTML = party.map((p, i) => `<span class="chip"><span class="av" style="--c:${COLORS[i]}">${esc(p.name[0])}</span>${esc(p.name)}` +
-    `<button data-rm="${i}" aria-label="Remove ${esc(p.name)}">&times;</button></span>`).join('');
-  $('addPlayer').hidden = party.length >= MAX_PLAYERS;
-  $('partyHint').textContent = HINT;
-}
-$('tabs').addEventListener('click', e => { const m = e.target.dataset.mode; if (m) { mode = m; renderHub(); } });
-$('addPlayer').addEventListener('submit', e => {
-  e.preventDefault();
-  const name = $('playerName').value.trim();
-  if (!name) return;
-  party.push({ name, pts: 0 });
-  $('playerName').value = '';
-  saveParty(); renderHub();
-  $('playerName').focus();
-});
-$('chips').addEventListener('click', e => {
-  const i = e.target.dataset.rm;
-  if (i === undefined) return;
-  party.splice(+i, 1);
-  saveParty(); renderHub();
-});
-
-const groups = [...new Set(BOARDS.map(b => b.group))];
-$('groups').innerHTML = groups.map(g => `<section class="group"><h2 class="eyebrow">${g}</h2><div class="cards">` +
-  BOARDS.filter(b => b.group === g).map(b => `<button class="card" data-board="${b.id}"><span class="card-title">${esc(b.title)}</span>` +
-    `<span class="card-meta"><span class="tag sm"><span>${esc(b.tag)}</span></span><span class="card-start">${b.start}</span></span></button>`).join('') +
-  '</div></section>').join('');
-$('groups').addEventListener('click', e => { const c = e.target.closest('[data-board]'); if (c) startGame(c.dataset.board); });
+/* ---------- State ---------- */
+let mode = 'solo', game = null, me = 0, deadline = null, net = null, lastT = -1;
+const randomBoard = () => { let n; do n = 1 + Math.floor(Math.random() * BOARDS.length); while (BOARDS.length > 1 && game && n === game.n); return n; };
+const myTurn = () => game && !game.over && game.seq[game.t][1] === me;
 
 function show(view) {
-  $('hub').hidden = view !== 'hub';
-  $('game').hidden = view !== 'game';
-  scrollTo(0, 0);
+  $('play').hidden = view !== 'play';
+  $('partyMenu').hidden = view !== 'partyMenu';
+  $('lobby').hidden = view !== 'lobby';
+  $('tabSolo').setAttribute('aria-selected', mode === 'solo');
+  $('tabParty').setAttribute('aria-selected', mode === 'party');
 }
 
-/* Game */
-let game, results = [], active = -1;
+function startSolo(n) {
+  leaveRoom();
+  mode = 'solo'; me = 0; deadline = null; lastT = -1;
+  game = newGame(n, [{ id: 'me', name: 'You' }]);
+  history.replaceState(null, '', '#' + n);
+  say(''); show('play'); render();
+}
 
-function startGame(id) {
-  if (mode === 'party' && party.length < 2) {
-    $('partyHint').textContent = 'Add at least 2 players to start a party game.';
-    return $('playerName').focus();
+/* ---------- Rendering ---------- */
+function render() {
+  const b = board(game.n), solo = game.players.length === 1;
+  document.title = `Board ${game.n} | 501`;
+  $('boardNo').textContent = `Board ${game.n}`;
+  $('title').textContent = b.title;
+  $('note').textContent = b.note;
+  $('sheet').innerHTML = solo ? soloSheet(b) : partySheet(b);
+  const turnP = game.over ? -1 : game.seq[game.t][1];
+  $('throwForm').hidden = $('guess').hidden = game.over;
+  $('q').disabled = $('throwBtn').disabled = !myTurn();
+  $('q').placeholder = myTurn() ? `Name ${/^[aeiou]/i.test(b.thing) ? 'an' : 'a'} ${b.thing}` : `${game.players[turnP] ? game.players[turnP].name : ''} is throwing`;
+  if (!myTurn()) { $('q').value = ''; $('guess').textContent = ''; }
+  renderDone(b);
+  tick();
+}
+
+function soloSheet(b) {
+  const cells = game.cells[0], next = game.over ? -1 : game.seq[game.t][0];
+  let left = b.start, html = '';
+  const lastIdx = cells.length - 1;
+  for (let r = 0; r < ROUNDS; r++) {
+    const c = cells[r];
+    if (!c) {
+      html += `<tr class="${r === next ? 'next' : ''}"><th class="rn num" scope="row">${r + 1}</th><td class="wait" colspan="3">${r === next ? 'Your throw' : ''}</td></tr>`;
+      continue;
+    }
+    if (c.k === 'hit') left -= c.v;
+    const sc = c.k === 'hit' ? c.v : c.k === 'bust' ? 'Bust' : c.k === 'time' ? 'Time' : '0';
+    const sub = c.k === 'time' ? 'Ran out of time' : c.k === 'miss' ? 'Not on this board' : `#${c.rank} of ${b.size}${c.k === 'bust' ? `, worth ${c.v}` : ''}`;
+    html += `<tr class="${c.k}${r === lastIdx ? ' fresh' : ''}"><th class="rn num" scope="row">${r + 1}</th>` +
+      `<td><span class="ans">${c.name ? esc(c.name) : 'No throw'}</span><span class="rank">${sub}</span></td>` +
+      `<td class="r"><span class="sc num">${sc}</span></td><td class="r"><span class="togo num${r === lastIdx ? ' now' : ''}">${left}</span></td></tr>`;
   }
-  players = mode === 'party' ? party : [solo];
-  const board = BOARDS.find(b => b.id === id), n = players.length, seq = [];
-  for (let r = 0; r < ROUNDS; r++) for (let i = 0; i < n; i++) seq.push({ r, p: r % 2 ? n - 1 - i : i }); // snake order
-  game = { board, pool: POOLS[board.pool], seq, t: 0, cells: players.map(() => []), used: new Set(), over: false };
-  say('');
-  show('game'); clearSearch(); render();
-  $('q').focus();
+  return `<table class="sheet"><thead><tr><th class="rn"><span hidden>Throw</span></th><th>Answer</th><th class="r">Scored</th><th class="r">To go</th></tr></thead>` +
+    `<tbody><tr><th class="rn" scope="row"></th><td class="wait">Start</td><td></td><td class="r"><span class="togo num${cells.length ? '' : ' now'}">${b.start}</span></td></tr>${html}</tbody></table>`;
 }
 
-const left = p => game.board.start - game.cells[p].reduce((s, c) => s + (c && c.kind === 'hit' ? c.value : 0), 0);
-const you = p => players[p] === solo;
-
-function say(text, kind = '') { $('msg').textContent = text; $('msg').className = kind; }
-
-function lockIn(item) {
-  if (game.over || !item) return;
-  if (game.used.has(item.name)) return say(`${item.name} is already taken.`, 'bust');
-  const { p, r } = game.seq[game.t], v = game.board.values.get(item.name) || 0, before = left(p);
-  const kind = !v ? 'miss' : v > before ? 'bust' : 'hit';
-  game.used.add(item.name);
-  game.cells[p][r] = { name: item.name, value: v, kind };
-  say(kind === 'miss' ? `${item.name} isn't on this board. 0.` : kind === 'bust' ? `${item.name} is ${v}. Bust.`
-    : v === before ? `${item.name} is ${v}. Right on 0.` : `${item.name}: ${v}.`, kind);
-  advance();
+function partySheet(b) {
+  const cur = game.over ? null : game.seq[game.t];
+  const head = game.players.map((pl, i) => `<th class="pl${cur && cur[1] === i ? ' turn' : ''}" scope="col">${esc(pl.name)}${i === me ? ' (you)' : ''}</th>`).join('');
+  const left = game.players.map((_, i) => `<td class="r"><span class="togo now num">${toGo(game, i)}</span></td>`).join('');
+  const rows = [...Array(ROUNDS).keys()].map(r => `<tr><th class="rn num" scope="row">${r + 1}</th>` + game.players.map((_, p) => {
+    const c = game.cells[p][r];
+    if (!c) return `<td class="cell wait">${cur && cur[0] === r && cur[1] === p ? 'Throwing' : ''}</td>`;
+    if (c.k === 'done') return '<td class="cell wait">Done</td>';
+    const sc = c.k === 'hit' ? c.v : c.k === 'bust' ? 'Bust' : c.k === 'time' ? 'Time' : '0';
+    return `<td class="cell ${c.k}"><span class="ans">${c.name ? esc(c.name) : ''}</span><span class="sc num">${sc}</span></td>`;
+  }).join('') + '</tr>').join('');
+  return `<table class="sheet party"><thead><tr><th class="rn"></th>${head}</tr><tr class="left"><th class="rn"><span hidden>To go</span></th>${left}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function advance() {
-  clearSearch();
-  game.t++;
-  while (game.t < game.seq.length && left(game.seq[game.t].p) === 0) { // finished players sit out
-    const { p, r } = game.seq[game.t];
-    game.cells[p][r] = { kind: 'done' };
-    game.t++;
+function renderDone(b) {
+  $('done').hidden = !game.over;
+  if (!game.over) return;
+  const solo = game.players.length === 1;
+  if (solo) {
+    const left = toGo(game, 0), thrown = game.cells[0].filter(c => c && c.k !== 'done').length;
+    $('doneBig').textContent = left === 0 ? 'Checked out' : `${left} left`;
+    $('doneText').textContent = left === 0 ? `You hit 0 in ${thrown} throw${thrown > 1 ? 's' : ''}.` : 'Lowest total wins. Send it and see who gets closer.';
+    $('standings').hidden = true;
+  } else {
+    const s = standings(game), winners = s.filter(x => x.place === 1);
+    $('doneBig').textContent = winners.length > 1 ? 'Tie' : `${winners[0].name} wins`;
+    $('doneText').textContent = winners[0].left === 0 ? 'Checked out on 0.' : `Closest to 0 with ${winners[0].left} left.`;
+    $('standings').hidden = false;
+    $('standings').innerHTML = s.map(x => `<li><span>${x.place}. ${esc(x.name)}</span><span class="num">${x.left}</span></li>`).join('');
   }
-  if (game.t >= game.seq.length) finish();
+  $('nextBtn').hidden = mode === 'party' && !(net && net.role === 'host');
+  $('allSum').textContent = `All ${b.size} answers`;
+  $('allList').innerHTML = [...b.values].filter(x => x[1] > 0).sort((x, y) => y[1] - x[1])
+    .map(([n, v], i) => `<li class="${game.used.includes(n) ? 'mine' : ''}"><span>${i + 1}. ${esc(n)}</span><span class="num">${v}</span></li>`).join('');
+}
+
+function say(text, kind = '') { $('say').textContent = text; $('say').className = 'say ' + kind; }
+function feedback(c, who) {
+  const b = board(game.n), name = who ? `${who}: ` : '';
+  if (c.k === 'time') return say(`${name}Time's up. No score.`, 'miss');
+  if (c.k === 'miss') return say(`${name}${c.name} isn't on this board. No score.`, 'miss');
+  if (c.k === 'bust') return say(`${name}${c.name} is ${c.v}. Bust, only ${c.before} to go.`, 'bust');
+  say(`${name}${c.name}: ${c.v}, #${c.rank} of ${b.size}.${c.v === c.before ? ' Checked out!' : ''}`, 'hit');
+}
+
+/* ---------- Clock ---------- */
+function tick() {
+  const ms = deadline ? Math.max(0, deadline - Date.now()) : TURN, live = game && !game.over;
+  $('secs').textContent = Math.ceil(ms / 1000);
+  $('sweep').style.strokeDashoffset = RING * (1 - ms / TURN);
+  $('clock').classList.toggle('low', !!deadline && ms <= 5000);
+  if (!live || !deadline || ms > 0) return;
+  if (mode === 'solo') { deadline = null; feedback(play(game, null)); afterSolo(); }
+  else if (net && net.role === 'host') hostPlay(null, game.seq[game.t][1]);
+}
+setInterval(tick, 200);
+
+/* ---------- Solo play ---------- */
+function afterSolo() {
+  deadline = game.over ? null : Date.now() + TURN;
+  $('q').value = ''; $('guess').textContent = '';
   render();
   if (!game.over) $('q').focus();
 }
-
-function finish() {
-  game.over = true;
-  const best = Math.min(...players.map((_, i) => left(i)));
-  game.winners = players.filter((_, i) => left(i) === best);
-  if (players.length > 1) game.winners.forEach(p => p.pts++);
-}
-
-function cell(c, picking) {
-  if (picking) return '<td class="picking">Picking&hellip;</td>';
-  if (!c) return '<td></td>';
-  if (c.kind === 'pass') return '<td class="pass">Pass</td>';
-  if (c.kind === 'done') return '<td class="done">Done</td>';
-  const tail = c.kind === 'hit' ? `&minus;${c.value}` : c.kind === 'bust' ? `Bust &middot; ${c.value}` : '0';
-  return `<td class="${c.kind}"><div><span class="nm" title="${esc(c.name)}">${esc(c.name)}</span><b>${tail}</b></div></td>`;
-}
-
-function render() {
-  const { board, seq, t, cells, over } = game, cur = over ? null : seq[t], multi = players.length > 1;
-  $('meta').textContent = over ? `${board.group} · Final` : `${board.group} · Round ${cur.r + 1} of ${ROUNDS}`;
-  $('title').textContent = board.title;
-  $('tag').textContent = board.tag;
-  $('start').textContent = board.start;
-  $('note').textContent = board.note;
-  $('controls').hidden = over;
-  if (cur) {
-    const name = players[cur.p].name, art = /^[aeiou]/.test(board.thing) ? 'an' : 'a';
-    $('clock').style.setProperty('--c', COLORS[cur.p]);
-    $('clockText').textContent = you(cur.p) ? "You're on the clock" : `${name} is on the clock`;
-    $('q').placeholder = `Search for ${art} ${board.thing}` + (you(cur.p) ? '...' : `, ${name}...`);
-  }
-  $('grid').style.minWidth = `${70 + players.length * 150}px`;
-  $('grid').innerHTML =
-    `<tr><th class="corner rl"></th>${players.map((p, i) => `<th class="ph${cur && cur.p === i ? ' now' : ''}" style="--c:${COLORS[i]}"><div>` +
-      `<span class="av">${esc(p.name[0])}</span><span class="pn">${esc(p.name)}</span>${multi ? `<span class="pts">${p.pts} pts</span>` : ''}</div></th>`).join('')}</tr>` +
-    `<tr class="rem"><th class="rl"></th>${players.map((_, i) => `<td><div><span>Remaining</span><b class="${left(i) === 0 ? 'zero' : ''}">${left(i)}</b></div></td>`).join('')}</tr>` +
-    [...Array(ROUNDS).keys()].map(r => `<tr><th class="rl${cur && cur.r === r ? ' now' : ''}">R${r + 1}</th>` +
-      players.map((_, p) => cell(cells[p][r], cur && cur.r === r && cur.p === p)).join('') + '</tr>').join('');
-
-  $('result').hidden = !over;
-  if (!over) return;
-  const best = left(players.indexOf(game.winners[0])), names = game.winners.map(p => p.name);
-  $('resultTitle').textContent = !multi ? (best === 0 ? (you(0) ? 'Perfect. You hit 0.' : `Perfect. ${names[0]} hit 0.`) : `${you(0) ? 'You' : names[0]} finished on ${best}`)
-    : names.length > 1 ? `Tie on ${best}: ${names.join(' and ')}` : `${names[0]} wins on ${best}`;
-  $('resultText').textContent = multi ? players.map((p, i) => `${p.name} ${left(i)}`).join('  ·  ')
-    : best === 0 ? 'Right on the number. Share it and see if your friends can match it.' : 'Lower is better. Share it and see who gets closer.';
-  $('reveal').innerHTML = [...board.values].sort((a, b) => b[1] - a[1])
-    .map(([n, v]) => `<li class="${game.used.has(n) ? 'used' : ''}"><span>${esc(n)}</span><span>${v}</span></li>`).join('');
-}
-
-/* Search box: type, arrow to choose, Enter or Lock in to commit. */
-function clearSearch() { $('q').value = ''; results = []; active = -1; renderOpts(); }
-const pickable = i => results[i] && !game.used.has(results[i].name);
-
-function renderOpts() {
-  const q = $('q'), ul = $('opts'), open = q.value.trim() !== '' && document.activeElement === q;
-  ul.hidden = !open;
-  q.setAttribute('aria-expanded', open);
-  ul.innerHTML = results.length ? results.map((it, i) => {
-    const taken = game && game.used.has(it.name);
-    return `<li role="option" id="opt${i}" data-i="${i}" aria-selected="${i === active}"${taken ? ' class="taken" aria-disabled="true"' : ''}>` +
-      `<span>${esc(it.name)}</span>${taken ? '<em>Taken</em>' : ''}</li>`;
-  }).join('') : '<li class="none">No match. Check the spelling.</li>';
-  if (active >= 0) { q.setAttribute('aria-activedescendant', 'opt' + active); $('opt' + active).scrollIntoView({ block: 'nearest' }); }
-  else q.removeAttribute('aria-activedescendant');
-  $('lock').disabled = active < 0;
-}
-
+let guess = null;
 $('q').addEventListener('input', () => {
-  results = search($('q').value, game.pool);
-  active = results.findIndex((_, i) => pickable(i));
-  renderOpts();
+  if (mode === 'solo' && !deadline && !game.over) deadline = Date.now() + TURN; // the clock starts when you start typing
+  guess = bestGuess($('q').value, pool(board(game.n).pool));
+  const typed = norm($('q').value);
+  $('guess').innerHTML = guess ? (norm(guess.name) === typed ? '' : `Best match: <b>${esc(guess.name)}</b>`) : typed.length >= 3 ? 'No match yet' : '';
 });
-$('q').addEventListener('focus', renderOpts);
-$('q').addEventListener('blur', () => { $('opts').hidden = true; $('q').setAttribute('aria-expanded', false); });
-$('q').addEventListener('keydown', e => {
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    const step = e.key === 'ArrowDown' ? 1 : -1;
-    for (let i = active + step; i >= 0 && i < results.length; i += step) if (pickable(i)) { active = i; break; }
-    renderOpts();
-  } else if (e.key === 'Enter') {
-    e.preventDefault();
-    if (active >= 0) lockIn(results[active]); else if ($('q').value.trim()) say('Pick a name from the list.', 'miss');
-  } else if (e.key === 'Escape') { $('opts').hidden = true; $('q').setAttribute('aria-expanded', false); }
-});
-$('opts').addEventListener('mousedown', e => { // choose without losing focus; Lock in commits
+$('throwForm').addEventListener('submit', e => {
   e.preventDefault();
-  const li = e.target.closest('[data-i]');
-  if (!li || !pickable(+li.dataset.i)) return;
-  active = +li.dataset.i;
-  $('q').value = results[active].name;
-  renderOpts();
-  $('opts').hidden = true;
-});
-$('lock').addEventListener('click', () => active >= 0 && lockIn(results[active]));
-$('pass').addEventListener('click', () => {
-  const { p, r } = game.seq[game.t];
-  game.cells[p][r] = { kind: 'pass' };
-  say(`${you(p) ? 'You' : players[p].name} passed.`, 'miss');
-  advance();
+  if (!myTurn()) return;
+  if (!guess || !$('q').value.trim()) return say("Can't find that one. Check the spelling.", 'miss');
+  if (game.used.includes(guess.name)) return say(`${guess.name} is already on the board.`, 'miss');
+  const name = guess.name;
+  guess = null;
+  if (mode === 'solo') { feedback(play(game, name)); afterSolo(); }
+  else if (net.role === 'host') hostPlay(name, me);
+  else { net.conn.send({ t: 'throw', name }); $('q').value = ''; $('guess').textContent = ''; }
 });
 
-$('back').addEventListener('click', () => { show('hub'); renderHub(); });
-$('toHub').addEventListener('click', () => { show('hub'); renderHub(); });
-$('again').addEventListener('click', () => startGame(game.board.id));
-$('share').addEventListener('click', async () => {
-  const text = `501: ${game.board.title} (start ${game.board.start})\n` +
-    players.map((p, i) => `${p.name}: ${left(i)}`).join('\n') + `\n${location.origin}${location.pathname}`;
+/* ---------- Sharing ---------- */
+function shareText() {
+  const b = board(game.n), url = `${location.origin}${location.pathname}#${game.n}`;
+  if (game.players.length === 1) {
+    const cells = game.cells[0].filter(c => c && c.k !== 'done'), left = toGo(game, 0);
+    const marks = cells.map(c => c.k === 'hit' ? `🟩#${c.rank}` : c.k === 'bust' ? '🟥' : '⬜').join(' ');
+    return `501 #${game.n} ${b.emoji} ${b.title}\n${marks}\n${left === 0 ? `🎯 Checked out in ${cells.length}` : `${left} left`}\n${url}`;
+  }
+  const medal = ['🥇', '🥈', '🥉'];
+  const lines = standings(game).map(x => `${medal[x.place - 1] || x.place + '.'} ${x.name} ${x.left}${x.left === 0 ? ' 🎯' : ''}`);
+  return `501 party #${game.n} ${b.emoji} ${b.title}\n${lines.join('\n')}\n${url}`;
+}
+let toastTimer;
+function toast(text) { $('toast').textContent = text; $('toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').hidden = true, 2200); }
+async function copyOrShare(text, copied) {
   try {
-    if (navigator.share) await navigator.share({ text });
-    else { await navigator.clipboard.writeText(text); $('share').textContent = 'Copied'; }
-  } catch (err) { if (err.name !== 'AbortError') prompt('Copy your results:', text); }
-});
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) return await navigator.share({ text });
+    await navigator.clipboard.writeText(text); toast(copied);
+  } catch (e) { if (e.name !== 'AbortError') prompt('Copy this:', text); }
+}
+$('shareBtn').addEventListener('click', () => copyOrShare(shareText(), 'Copied. Paste it to your friends.'));
+$('nextBtn').addEventListener('click', () => mode === 'party' ? hostNewGame() : startSolo(randomBoard()));
 
-renderHub();
+/* ---------- Party rooms (peer to peer, the host's browser runs the game) ---------- */
+const PREFIX = 'ali501-', LETTERS = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+const myName = () => ($('myName').value.trim() || 'Player').slice(0, 14);
+function loadPeer() {
+  return window.Peer ? Promise.resolve() : new Promise((ok, fail) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js';
+    s.onload = ok; s.onerror = () => fail(new Error('Could not load party mode. Check your connection.'));
+    document.head.appendChild(s);
+  });
+}
+function partyMenu(text = '') {
+  mode = 'party'; show('partyMenu');
+  $('partySay').textContent = text;
+  $('myName').value = $('myName').value || store.get('501-name') || '';
+}
+function leaveRoom() {
+  if (!net) return;
+  const old = net; net = null;
+  try { old.peer.destroy(); } catch {}
+}
+function lobby() {
+  show('lobby');
+  $('roomCode').textContent = net.code;
+  $('who').innerHTML = net.players.map((p, i) => `<li>${esc(p.name)} <span>${i === 0 ? 'host' : ''}</span></li>`).join('');
+  const host = net.role === 'host';
+  $('startBtn').hidden = !host;
+  $('startBtn').disabled = net.players.length < 2;
+  $('lobbySay').textContent = host ? (net.players.length < 2 ? 'Send the code to a friend. Start unlocks at 2 players.' : '') : 'Waiting for the host to start.';
+}
+
+async function hostRoom() {
+  store.set('501-name', myName());
+  try { await loadPeer(); } catch (e) { return partyMenu(e.message); }
+  leaveRoom();
+  const code = Array.from({ length: 4 }, () => LETTERS[Math.floor(Math.random() * LETTERS.length)]).join('');
+  const peer = new Peer(PREFIX + code);
+  net = { role: 'host', peer, code, conns: new Map(), players: [{ id: 'host', name: myName() }], game: null, last: null, deadline: null };
+  peer.on('open', lobby);
+  peer.on('error', e => e.type === 'unavailable-id' ? hostRoom() : partyMenu('Could not open a room. Try again.'));
+  peer.on('connection', conn => {
+    conn.on('data', msg => hostMessage(conn, msg));
+    conn.on('close', () => {
+      if (!net || net.role !== 'host') return;
+      net.conns.delete(conn.peer);
+      if (!net.game || net.game.over) { net.players = net.players.filter(p => p.id !== conn.peer); }
+      broadcast();
+    });
+  });
+}
+function hostMessage(conn, msg) {
+  if (!net || net.role !== 'host' || !msg) return;
+  if (msg.t === 'hello') {
+    if (net.game && !net.game.over) return conn.send({ t: 'error', text: 'That game already started. Ask for the next one.' });
+    if (net.players.length >= 8) return conn.send({ t: 'error', text: 'That room is full.' });
+    net.conns.set(conn.peer, conn);
+    if (!net.players.some(p => p.id === conn.peer)) net.players.push({ id: conn.peer, name: String(msg.name || 'Player').slice(0, 14) });
+    broadcast();
+  } else if (msg.t === 'throw' && net.game) {
+    hostPlay(String(msg.name), net.game.players.findIndex(p => p.id === conn.peer));
+  }
+}
+function hostNewGame() {
+  if (!net || net.role !== 'host') return;
+  net.game = newGame(randomBoard(), net.players.map(p => ({ id: p.id, name: p.name })));
+  net.last = null; net.deadline = Date.now() + TURN;
+  broadcast();
+}
+function hostPlay(name, p) {
+  const g = net && net.game;
+  if (!g || g.over || p < 0 || g.seq[g.t][1] !== p) return;
+  if (name != null && (g.used.includes(name) || !pool(board(g.n).pool).some(it => it.name === name))) return;
+  net.last = { ...play(g, name), t: g.t };
+  net.deadline = g.over ? null : Date.now() + TURN;
+  broadcast();
+}
+function broadcast() {
+  const ms = net.deadline ? Math.max(0, net.deadline - Date.now()) : null;
+  const base = { t: 'state', code: net.code, players: net.players, game: net.game, last: net.last, ms };
+  for (const [id, conn] of net.conns) if (conn.open) conn.send({ ...base, you: id });
+  applyState({ ...base, you: 'host' });
+}
+function applyState(s) {
+  if (!net) return;
+  net.code = s.code; net.players = s.players;
+  if (!s.game) return lobby();
+  mode = 'party';
+  game = s.game;
+  me = game.players.findIndex(p => p.id === s.you);
+  deadline = s.ms == null ? null : Date.now() + s.ms;
+  if (s.last && s.last.t !== lastT) { lastT = s.last.t; feedback(s.last, game.players[s.last.p].name); }
+  else if (!s.last) { lastT = -1; say(''); }
+  show('play'); render();
+  if (myTurn()) $('q').focus();
+}
+async function joinRoom(code) {
+  code = code.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
+  if (code.length !== 4) return partyMenu('Room codes are 4 letters.');
+  store.set('501-name', myName());
+  try { await loadPeer(); } catch (e) { return partyMenu(e.message); }
+  leaveRoom();
+  const peer = new Peer();
+  net = { role: 'guest', peer, code, players: [] };
+  partyMenu('Joining...');
+  peer.on('open', () => {
+    const conn = net.conn = peer.connect(PREFIX + code, { reliable: true });
+    conn.on('open', () => conn.send({ t: 'hello', name: myName() }));
+    conn.on('data', msg => msg.t === 'state' ? applyState(msg) : partyMenu(msg.text));
+    conn.on('close', () => { if (net && net.conn === conn) { leaveRoom(); partyMenu('The host closed the room.'); } });
+  });
+  peer.on('error', e => { leaveRoom(); partyMenu(e.type === 'peer-unavailable' ? `No room called ${code}. Check the code.` : 'Could not connect. Try again.'); });
+}
+// A player who drops out mid-game just times out, right away.
+setInterval(() => {
+  const g = net && net.role === 'host' && net.game;
+  if (g && !g.over) { const id = g.players[g.seq[g.t][1]].id; if (id !== 'host' && !net.conns.has(id)) hostPlay(null, g.seq[g.t][1]); }
+}, 1000);
+
+$('hostBtn').addEventListener('click', hostRoom);
+$('joinForm').addEventListener('submit', e => { e.preventDefault(); joinRoom($('joinCode').value); });
+$('startBtn').addEventListener('click', hostNewGame);
+$('leaveBtn').addEventListener('click', () => { leaveRoom(); partyMenu(); });
+$('inviteBtn').addEventListener('click', () => copyOrShare(`Join my 501 room: ${location.origin}${location.pathname}#room=${net.code}`, 'Invite link copied.'));
+$('tabParty').addEventListener('click', () => { if (mode !== 'party') { deadline = null; partyMenu(); } });
+$('tabSolo').addEventListener('click', () => { if (mode !== 'solo') startSolo(randomBoard()); });
+$('helpOpen').addEventListener('click', () => $('help').showModal());
+
+/* ---------- Start ---------- */
+$('foot').textContent = `${BOARDS.length} boards. Stats as of ${UPDATED}.`;
+const hash = location.hash.slice(1), room = hash.match(/^room=([A-Za-z]{4})$/);
+if (room) {
+  partyMenu();
+  $('joinCode').value = room[1].toUpperCase();
+  if ($('myName').value) joinRoom(room[1]); else { $('partySay').textContent = 'Add your name, then join.'; $('myName').focus(); }
+} else {
+  startSolo(+hash >= 1 && +hash <= BOARDS.length ? +hash : randomBoard());
+  if (!store.get('501-seen')) { store.set('501-seen', '1'); $('help').showModal(); }
+}
 </script>
 </body>
 </html>
