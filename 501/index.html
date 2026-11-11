@@ -348,10 +348,10 @@ function render() {
 function soloSheet(b) {
   const cells = game.cells[0], next = game.over ? -1 : game.seq[game.t][0];
   let left = b.start, html = '';
-  const lastIdx = cells.length - 1;
+  const lastIdx = cells.reduce((m, c, i) => c && c.k !== 'done' ? i : m, -1); // rounds after checking out stay blank
   for (let r = 0; r < ROUNDS; r++) {
     const c = cells[r];
-    if (!c) {
+    if (!c || c.k === 'done') {
       html += `<tr class="${r === next ? 'next' : ''}"><th class="rn num" scope="row">${r + 1}</th><td class="wait" colspan="3">${r === next ? 'Your throw' : ''}</td></tr>`;
       continue;
     }
@@ -363,7 +363,7 @@ function soloSheet(b) {
       `<td class="r"><span class="sc num">${sc}</span></td><td class="r"><span class="togo num${r === lastIdx ? ' now' : ''}">${left}</span></td></tr>`;
   }
   return `<table class="sheet"><thead><tr><th class="rn"><span hidden>Throw</span></th><th>Answer</th><th class="r">Scored</th><th class="r">To go</th></tr></thead>` +
-    `<tbody><tr><th class="rn" scope="row"></th><td class="wait">Start</td><td></td><td class="r"><span class="togo num${cells.length ? '' : ' now'}">${b.start}</span></td></tr>${html}</tbody></table>`;
+    `<tbody><tr><th class="rn" scope="row"></th><td class="wait">Start</td><td></td><td class="r"><span class="togo num${lastIdx < 0 ? ' now' : ''}">${b.start}</span></td></tr>${html}</tbody></table>`;
 }
 
 function partySheet(b) {
