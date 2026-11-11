@@ -121,6 +121,7 @@ tr.next .rn { color:var(--sisal); }
 .bars span { position:absolute; left:-4px; right:-4px; bottom:-21px; text-align:center; font-size:12px; color:var(--dim); white-space:nowrap; }
 .bars .mine span { color:var(--sisal); font-weight:700; }
 .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.preview { margin:16px 0 0; padding:12px 14px; background:var(--deep); border:1px dashed var(--line); border-radius:10px; font:15px/1.45 "Atkinson Hyperlegible", system-ui, sans-serif; white-space:pre-wrap; overflow-wrap:anywhere; }
 .name-row { margin-top:16px; }
 .next-in { color:var(--dim); }
 .next-in .num { color:var(--chalk); font-size:21px; letter-spacing:.02em; }
@@ -216,6 +217,7 @@ dialog form { margin-top:18px; }
         <label class="name-row" id="nameRow" hidden>Your name, so friends know whose score it is
           <input class="field" id="shareName" maxlength="14" autocomplete="nickname">
         </label>
+        <pre class="preview" id="preview" aria-label="What Share sends"></pre>
         <div class="actions">
           <button class="btn primary" id="shareBtn">Share</button>
           <button class="btn" id="nextBtn">New board</button>
@@ -519,6 +521,7 @@ function renderDone(b) {
   $('doneSide').hidden = k === 'party';
   $('doneSide').innerHTML = sideLinks();
   renderCrowd();
+  $('preview').textContent = shareText();
   $('allSum').textContent = `All ${b.size} answers`;
   $('allList').innerHTML = [...b.values].filter(x => x[1] > 0).sort((x, y) => y[1] - x[1])
     .map(([n, v], i) => `<li class="${game.used.includes(n) ? 'mine' : ''}"><span>${i + 1}. ${esc(n)}</span><span class="num">${v}</span></li>`).join('');
@@ -613,7 +616,7 @@ async function tally() {
     const total = counts.reduce((s, [, n]) => s + n, 0), worse = counts.reduce((s, [v, n]) => s + (v > left ? n : 0), 0);
     crowd = { counts, total, left, pct: total > 1 ? Math.round(100 * worse / (total - 1)) : null };
   } catch { crowd = null; }
-  if (game.over) renderCrowd();
+  if (game.over) { renderCrowd(); $('preview').textContent = shareText(); }
 }
 function renderCrowd() {
   $('crowd').hidden = !crowd || mode === 'party';
