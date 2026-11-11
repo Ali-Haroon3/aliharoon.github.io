@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>501 Daily</title>
+<meta name="description" content="Daily trivia darts. Start at 501, check out at exactly zero.">
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#101423; --panel:#191e2e; --panel-2:#232a3f; --line:#3a4258; --text:#fff; --muted:#a8b0c4;
+  --yellow:#fff200; --storm:#b04df9; --red:#e5383b; --green:#318218; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ink); color:var(--text); font:16px/1.4 Inter,system-ui,sans-serif; }
+main { max-width:560px; margin:0 auto; padding:24px 16px 48px; }
+h1 { font:400 64px/1 Anton,Impact,sans-serif; margin:0; letter-spacing:1px; }
+h1 span { color:var(--yellow); }
+.sub { color:var(--muted); margin:4px 0 20px; }
+.card { background:var(--panel); border:2px solid var(--line); box-shadow:6px 6px 0 #000; padding:16px;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%); margin-bottom:20px; }
+.cat { font:400 26px/1.1 Anton,Impact,sans-serif; text-transform:uppercase; }
+.cat small { display:block; font:600 14px Inter,sans-serif; color:var(--yellow); text-transform:none; margin-top:4px; }
+.board { display:flex; justify-content:space-between; align-items:flex-end; margin:16px 0; }
+.score { font:400 112px/0.9 Anton,Impact,sans-serif; }
+.darts { text-align:right; color:var(--muted); font-weight:600; }
+.darts b { display:block; font:400 40px/1 Anton,Impact,sans-serif; color:var(--text); }
+form { display:flex; gap:8px; }
+input { flex:1; min-width:0; font:inherit; padding:12px; background:var(--panel-2); color:var(--text); border:2px solid var(--line); }
+input:focus { outline:3px solid var(--yellow); outline-offset:0; }
+button { font:400 20px Anton,Impact,sans-serif; letter-spacing:1px; padding:10px 18px; background:var(--yellow); color:#000;
+  border:0; box-shadow:4px 4px 0 #000; cursor:pointer; text-transform:uppercase; }
+button:active { transform:translate(2px,2px); box-shadow:2px 2px 0 #000; }
+#msg { min-height:1.4em; margin:10px 0 0; font-weight:600; }
+ol { list-style:none; padding:0; margin:0; }
+li { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); }
+li:last-child { border:0; }
+.bust { color:var(--red); } .miss { color:var(--muted); } .hit { color:var(--yellow); }
+details { color:var(--muted); } summary { cursor:pointer; color:var(--text); font-weight:600; }
+#end h2 { font:400 40px/1 Anton,Impact,sans-serif; margin:0 0 8px; text-transform:uppercase; }
+.win { border-color:var(--green); } .lose { border-color:var(--red); }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1><span>501</span> Daily</h1>
+  <p class="sub" id="day"></p>
+
+  <div class="card">
+    <div class="cat" id="cat"></div>
+    <div class="board">
+      <div class="score" id="score" aria-live="polite">501</div>
+      <div class="darts">Darts<b id="darts">0/20</b></div>
+    </div>
+    <form id="throw">
+      <input id="guess" list="answers" autocomplete="off" placeholder="Type an answer" aria-label="Your answer">
+      <button>Throw</button>
+    </form>
+    <datalist id="answers"></datalist>
+    <p id="msg" role="status"></p>
+  </div>
+
+  <div class="card" id="end" hidden>
+    <h2 id="endTitle"></h2>
+    <p id="endText"></p>
+    <button id="share">Copy result</button>
+  </div>
+
+  <div class="card"><ol id="log"></ol></div>
+
+  <details>
+    <summary>How to play</summary>
+    <p>Start at 501. Name something in today's category and its number comes off your score.
+    Land on exactly 0 to check out. Go under 0 and it's a bust: the dart counts, your score doesn't move.
+    Anything worth more than 180 is off the board and scores nothing. You get 20 darts. Fewest darts wins.
+    New category every day.</p>
+  </details>
+</main>
+
+<script>
+// Ordered lists: value = position (1-based). First occurrence wins.
+const CATS = [
+  { name: 'Elements', hint: 'Atomic number', list:
+    'Hydrogen,Helium,Lithium,Beryllium,Boron,Carbon,Nitrogen,Oxygen,Fluorine,Neon,Sodium,Magnesium,Aluminum,Silicon,Phosphorus,Sulfur,Chlorine,Argon,Potassium,Calcium,Scandium,Titanium,Vanadium,Chromium,Manganese,Iron,Cobalt,Nickel,Copper,Zinc,Gallium,Germanium,Arsenic,Selenium,Bromine,Krypton,Rubidium,Strontium,Yttrium,Zirconium,Niobium,Molybdenum,Technetium,Ruthenium,Rhodium,Palladium,Silver,Cadmium,Indium,Tin,Antimony,Tellurium,Iodine,Xenon,Cesium,Barium,Lanthanum,Cerium,Praseodymium,Neodymium,Promethium,Samarium,Europium,Gadolinium,Terbium,Dysprosium,Holmium,Erbium,Thulium,Ytterbium,Lutetium,Hafnium,Tantalum,Tungsten,Rhenium,Osmium,Iridium,Platinum,Gold,Mercury,Thallium,Lead,Bismuth,Polonium,Astatine,Radon,Francium,Radium,Actinium,Thorium,Protactinium,Uranium,Neptunium,Plutonium,Americium,Curium,Berkelium,Californium,Einsteinium,Fermium,Mendelevium,Nobelium,Lawrencium,Rutherfordium,Dubnium,Seaborgium,Bohrium,Hassium,Meitnerium,Darmstadtium,Roentgenium,Copernicium,Nihonium,Flerovium,Moscovium,Livermorium,Tennessine,Oganesson' },
+  { name: 'Original 151 Pokémon', hint: 'Pokédex number', list:
+    "Bulbasaur,Ivysaur,Venusaur,Charmander,Charmeleon,Charizard,Squirtle,Wartortle,Blastoise,Caterpie,Metapod,Butterfree,Weedle,Kakuna,Beedrill,Pidgey,Pidgeotto,Pidgeot,Rattata,Raticate,Spearow,Fearow,Ekans,Arbok,Pikachu,Raichu,Sandshrew,Sandslash,Nidoran F,Nidorina,Nidoqueen,Nidoran M,Nidorino,Nidoking,Clefairy,Clefable,Vulpix,Ninetales,Jigglypuff,Wigglytuff,Zubat,Golbat,Oddish,Gloom,Vileplume,Paras,Parasect,Venonat,Venomoth,Diglett,Dugtrio,Meowth,Persian,Psyduck,Golduck,Mankey,Primeape,Growlithe,Arcanine,Poliwag,Poliwhirl,Poliwrath,Abra,Kadabra,Alakazam,Machop,Machoke,Machamp,Bellsprout,Weepinbell,Victreebel,Tentacool,Tentacruel,Geodude,Graveler,Golem,Ponyta,Rapidash,Slowpoke,Slowbro,Magnemite,Magneton,Farfetch'd,Doduo,Dodrio,Seel,Dewgong,Grimer,Muk,Shellder,Cloyster,Gastly,Haunter,Gengar,Onix,Drowzee,Hypno,Krabby,Kingler,Voltorb,Electrode,Exeggcute,Exeggutor,Cubone,Marowak,Hitmonlee,Hitmonchan,Lickitung,Koffing,Weezing,Rhyhorn,Rhydon,Chansey,Tangela,Kangaskhan,Horsea,Seadra,Goldeen,Seaking,Staryu,Starmie,Mr. Mime,Scyther,Jynx,Electabuzz,Magmar,Pinsir,Tauros,Magikarp,Gyarados,Lapras,Ditto,Eevee,Vaporeon,Jolteon,Flareon,Porygon,Omanyte,Omastar,Kabuto,Kabutops,Aerodactyl,Snorlax,Articuno,Zapdos,Moltres,Dratini,Dragonair,Dragonite,Mewtwo,Mew" },
+  { name: 'Country calling codes', hint: 'The +number you dial. Over 180 is off the board', map: {
+    'United States':1,'Canada':1,'Russia':7,'Egypt':20,'South Africa':27,'Greece':30,'Netherlands':31,'Belgium':32,'France':33,'Spain':34,'Hungary':36,'Italy':39,'Romania':40,'Switzerland':41,'Austria':43,'United Kingdom':44,'Denmark':45,'Sweden':46,'Norway':47,'Poland':48,'Germany':49,'Peru':51,'Mexico':52,'Cuba':53,'Argentina':54,'Brazil':55,'Chile':56,'Colombia':57,'Venezuela':58,'Malaysia':60,'Australia':61,'Indonesia':62,'Philippines':63,'New Zealand':64,'Singapore':65,'Thailand':66,'Japan':81,'South Korea':82,'Vietnam':84,'China':86,'Turkey':90,'India':91,'Pakistan':92,'Afghanistan':93,'Sri Lanka':94,'Myanmar':95,'Iran':98,'Morocco':212,'Algeria':213,'Tunisia':216,'Libya':218,'Ghana':233,'Nigeria':234,'Ethiopia':251,'Kenya':254,'Tanzania':255,'Uganda':256,'Zimbabwe':263,'Portugal':351,'Ireland':353,'Iceland':354,'Finland':358,'Ukraine':380,'Hong Kong':852,'Bangladesh':880,'Taiwan':886,'Lebanon':961,'Jordan':962,'Saudi Arabia':966,'United Arab Emirates':971,'Israel':972,'Qatar':974,'Nepal':977 } },
+  { name: 'US Presidents', hint: 'Which number president (first term counts)', list:
+    'George Washington,John Adams,Thomas Jefferson,James Madison,James Monroe,John Quincy Adams,Andrew Jackson,Martin Van Buren,William Henry Harrison,John Tyler,James K. Polk,Zachary Taylor,Millard Fillmore,Franklin Pierce,James Buchanan,Abraham Lincoln,Andrew Johnson,Ulysses S. Grant,Rutherford B. Hayes,James Garfield,Chester Arthur,Grover Cleveland,Benjamin Harrison,Grover Cleveland,William McKinley,Theodore Roosevelt,William Howard Taft,Woodrow Wilson,Warren Harding,Calvin Coolidge,Herbert Hoover,Franklin D. Roosevelt,Harry Truman,Dwight Eisenhower,John F. Kennedy,Lyndon B. Johnson,Richard Nixon,Gerald Ford,Jimmy Carter,Ronald Reagan,George H. W. Bush,Bill Clinton,George W. Bush,Barack Obama,Donald Trump,Joe Biden' },
+  { name: 'US States', hint: 'Order it joined the Union', list:
+    'Delaware,Pennsylvania,New Jersey,Georgia,Connecticut,Massachusetts,Maryland,South Carolina,New Hampshire,Virginia,New York,North Carolina,Rhode Island,Vermont,Kentucky,Tennessee,Ohio,Louisiana,Indiana,Mississippi,Illinois,Alabama,Maine,Missouri,Arkansas,Michigan,Florida,Texas,Iowa,Wisconsin,California,Minnesota,Oregon,Kansas,West Virginia,Nevada,Nebraska,Colorado,North Dakota,South Dakota,Montana,Washington,Idaho,Wyoming,Utah,Oklahoma,New Mexico,Arizona,Alaska,Hawaii' },
+];
+const START = 501, MAX_DARTS = 20, BOARD_MAX = 180;
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+
+// Daily pick. ponytail: rotates through CATS in order, add more categories to stretch the cycle.
+const now = new Date();
+const today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+const dayNum = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2026, 10, 10)) / 864e5) + 1;
+const cat = CATS[((dayNum - 1) % CATS.length + CATS.length) % CATS.length];
+
+const answers = new Map(); // norm -> [display, value]
+if (cat.map) for (const [k, v] of Object.entries(cat.map)) answers.set(norm(k), [k, v]);
+else cat.list.split(',').forEach((k, i) => { if (!answers.has(norm(k))) answers.set(norm(k), [k, i + 1]); });
+
+const $ = id => document.getElementById(id);
+$('day').textContent = `Day #${dayNum}`;
+$('cat').innerHTML = `${cat.name}<small>${cat.hint}</small>`;
+$('answers').innerHTML = [...answers.values()].map(([k]) => `<option value="${k}">`).join('');
+
+let state = { day: today, throws: [] }; // throws: [name, value, kind]
+try { const s = JSON.parse(localStorage.getItem('501')); if (s && s.day === today) state = s; } catch {}
+const save = () => { try { localStorage.setItem('501', JSON.stringify(state)); } catch {} };
+
+const scoreLeft = () => state.throws.reduce((s, [, v, k]) => k === 'hit' ? s - v : s, START);
+const done = () => scoreLeft() === 0 || state.throws.length >= MAX_DARTS;
+
+function render() {
+  $('score').textContent = scoreLeft();
+  $('darts').textContent = `${state.throws.length}/${MAX_DARTS}`;
+  $('log').innerHTML = state.throws.map(([n, v, k], i) =>
+    `<li><span>${i + 1}. ${n} <span class="miss">(${v})</span></span><span class="${k}">${
+      k === 'hit' ? '−' + v : k === 'bust' ? 'BUST' : 'OFF BOARD'}</span></li>`).reverse().join('') || '<li class="miss">No darts yet.</li>';
+  const end = $('end');
+  end.hidden = !done();
+  $('throw').hidden = done();
+  if (done()) {
+    const won = scoreLeft() === 0;
+    end.className = 'card ' + (won ? 'win' : 'lose');
+    $('endTitle').textContent = won ? 'Checked out' : 'Out of darts';
+    $('endText').textContent = won ? `${state.throws.length} darts. Come back tomorrow for a new board.`
+                                   : `${scoreLeft()} left on the board. Come back tomorrow.`;
+  }
+}
+
+$('throw').addEventListener('submit', e => {
+  e.preventDefault();
+  if (done()) return;
+  const hit = answers.get(norm($('guess').value));
+  const msg = $('msg');
+  if (!hit) { msg.textContent = "That's not on today's list."; return; }
+  const [name, value] = hit;
+  if (state.throws.some(([n]) => n === name)) { msg.textContent = `Already used ${name}.`; return; }
+  const kind = value > BOARD_MAX ? 'miss' : value > scoreLeft() ? 'bust' : 'hit';
+  state.throws.push([name, value, kind]);
+  msg.textContent = kind === 'hit' ? `${name}: ${value}` : kind === 'bust' ? `${name} is ${value}. Bust.` : `${name} is ${value}. Off the board.`;
+  $('guess').value = '';
+  save(); render();
+});
+
+$('share').addEventListener('click', () => {
+  const won = scoreLeft() === 0;
+  const line = state.throws.map(([, v, k]) => k === 'hit' ? v : k === 'bust' ? 'X' : '0').join(' ');
+  const text = `501 Daily #${dayNum} · ${cat.name}\n${won ? `Checked out in ${state.throws.length} darts` : `${scoreLeft()} left`}\n${line}\n${location.href}`;
+  navigator.clipboard.writeText(text).then(() => $('share').textContent = 'Copied', () => alert(text));
+});
+
+render();
+</script>
+</body>
+</html>
