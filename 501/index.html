@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>501 Daily</title>
-<meta name="description" content="Daily trivia darts. Start at 501, check out at exactly zero.">
+<meta name="description" content="Daily trivia darts. Start on 501, five darts, get as close to zero as you can.">
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root { --ink:#101423; --panel:#191e2e; --panel-2:#232a3f; --line:#3a4258; --text:#fff; --muted:#a8b0c4;
-  --yellow:#fff200; --storm:#b04df9; --red:#e5383b; --green:#318218; }
+  --yellow:#fff200; --red:#e5383b; --green:#318218; }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--ink); color:var(--text); font:16px/1.4 Inter,system-ui,sans-serif; }
 main { max-width:560px; margin:0 auto; padding:24px 16px 48px; }
@@ -19,8 +19,9 @@ h1 span { color:var(--yellow); }
 .sub { color:var(--muted); margin:4px 0 20px; }
 .card { background:var(--panel); border:2px solid var(--line); box-shadow:6px 6px 0 #000; padding:16px;
   clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%); margin-bottom:20px; }
-.cat { font:400 26px/1.1 Anton,Impact,sans-serif; text-transform:uppercase; }
-.cat small { display:block; font:600 14px Inter,sans-serif; color:var(--yellow); text-transform:none; margin-top:4px; }
+.cat { font:400 28px/1.1 Anton,Impact,sans-serif; text-transform:uppercase; }
+.hint { color:var(--yellow); font-weight:600; margin:6px 0 0; }
+.src { color:var(--muted); font-size:13px; margin:4px 0 0; }
 .board { display:flex; justify-content:space-between; align-items:flex-end; margin:16px 0; }
 .score { font:400 112px/0.9 Anton,Impact,sans-serif; }
 .darts { text-align:right; color:var(--muted); font-weight:600; }
@@ -33,12 +34,13 @@ button { font:400 20px Anton,Impact,sans-serif; letter-spacing:1px; padding:10px
 button:active { transform:translate(2px,2px); box-shadow:2px 2px 0 #000; }
 #msg { min-height:1.4em; margin:10px 0 0; font-weight:600; }
 ol { list-style:none; padding:0; margin:0; }
-li { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); }
+li { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid var(--line); }
 li:last-child { border:0; }
-.bust { color:var(--red); } .miss { color:var(--muted); } .hit { color:var(--yellow); }
+.bust { color:var(--red); } .hit, .mine { color:var(--yellow); } .muted { color:var(--muted); }
 details { color:var(--muted); } summary { cursor:pointer; color:var(--text); font-weight:600; }
 #end h2 { font:400 40px/1 Anton,Impact,sans-serif; margin:0 0 8px; text-transform:uppercase; }
-.win { border-color:var(--green); } .lose { border-color:var(--red); }
+#end details { margin-top:16px; } #all { max-height:320px; overflow-y:auto; margin-top:8px; padding-right:8px; }
+.win { border-color:var(--green); }
 [hidden] { display:none !important; }
 </style>
 </head>
@@ -49,112 +51,151 @@ details { color:var(--muted); } summary { cursor:pointer; color:var(--text); fon
 
   <div class="card">
     <div class="cat" id="cat"></div>
+    <p class="hint" id="hint"></p>
+    <p class="src" id="src"></p>
     <div class="board">
       <div class="score" id="score" aria-live="polite">501</div>
-      <div class="darts">Darts<b id="darts">0/20</b></div>
+      <div class="darts">Darts left<b id="darts">5</b></div>
     </div>
     <form id="throw">
-      <input id="guess" list="answers" autocomplete="off" placeholder="Type an answer" aria-label="Your answer">
+      <input id="guess" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Name one" aria-label="Your answer">
       <button>Throw</button>
     </form>
-    <datalist id="answers"></datalist>
     <p id="msg" role="status"></p>
   </div>
 
   <div class="card" id="end" hidden>
     <h2 id="endTitle"></h2>
     <p id="endText"></p>
-    <button id="share">Copy result</button>
+    <button id="share">Send score</button>
+    <details><summary>Everything on today's board</summary><ol id="all"></ol></details>
   </div>
 
   <div class="card"><ol id="log"></ol></div>
 
   <details>
     <summary>How to play</summary>
-    <p>Start at 501. Name something in today's category and its number comes off your score.
-    Land on exactly 0 to check out. Go under 0 and it's a bust: the dart counts, your score doesn't move.
-    Anything worth more than 180 is off the board and scores nothing. You get 20 darts. Fewest darts wins.
-    New category every day.</p>
+    <p>You start on 501 with 5 darts. Each dart is one answer from today's category, and its number comes off your score.
+    Big names take big chunks. Niche ones are how you finish.</p>
+    <p>Land on exactly 0 for a perfect game. If an answer would take you below 0, it's a bust: the dart is gone and your score stays put.</p>
+    <p>Whatever's left after 5 darts is your score. Lowest wins, so send it to your friends. New board every day.</p>
   </details>
 </main>
 
 <script>
-// Ordered lists: value = position (1-based). First occurrence wins.
+const PFR = 'Pro Football Reference, as of Nov 10, 2026';
 const CATS = [
-  { name: 'Elements', hint: 'Atomic number', list:
-    'Hydrogen,Helium,Lithium,Beryllium,Boron,Carbon,Nitrogen,Oxygen,Fluorine,Neon,Sodium,Magnesium,Aluminum,Silicon,Phosphorus,Sulfur,Chlorine,Argon,Potassium,Calcium,Scandium,Titanium,Vanadium,Chromium,Manganese,Iron,Cobalt,Nickel,Copper,Zinc,Gallium,Germanium,Arsenic,Selenium,Bromine,Krypton,Rubidium,Strontium,Yttrium,Zirconium,Niobium,Molybdenum,Technetium,Ruthenium,Rhodium,Palladium,Silver,Cadmium,Indium,Tin,Antimony,Tellurium,Iodine,Xenon,Cesium,Barium,Lanthanum,Cerium,Praseodymium,Neodymium,Promethium,Samarium,Europium,Gadolinium,Terbium,Dysprosium,Holmium,Erbium,Thulium,Ytterbium,Lutetium,Hafnium,Tantalum,Tungsten,Rhenium,Osmium,Iridium,Platinum,Gold,Mercury,Thallium,Lead,Bismuth,Polonium,Astatine,Radon,Francium,Radium,Actinium,Thorium,Protactinium,Uranium,Neptunium,Plutonium,Americium,Curium,Berkelium,Californium,Einsteinium,Fermium,Mendelevium,Nobelium,Lawrencium,Rutherfordium,Dubnium,Seaborgium,Bohrium,Hassium,Meitnerium,Darmstadtium,Roentgenium,Copernicium,Nihonium,Flerovium,Moscovium,Livermorium,Tennessine,Oganesson' },
-  { name: 'Original 151 Pokémon', hint: 'Pokédex number', list:
-    "Bulbasaur,Ivysaur,Venusaur,Charmander,Charmeleon,Charizard,Squirtle,Wartortle,Blastoise,Caterpie,Metapod,Butterfree,Weedle,Kakuna,Beedrill,Pidgey,Pidgeotto,Pidgeot,Rattata,Raticate,Spearow,Fearow,Ekans,Arbok,Pikachu,Raichu,Sandshrew,Sandslash,Nidoran F,Nidorina,Nidoqueen,Nidoran M,Nidorino,Nidoking,Clefairy,Clefable,Vulpix,Ninetales,Jigglypuff,Wigglytuff,Zubat,Golbat,Oddish,Gloom,Vileplume,Paras,Parasect,Venonat,Venomoth,Diglett,Dugtrio,Meowth,Persian,Psyduck,Golduck,Mankey,Primeape,Growlithe,Arcanine,Poliwag,Poliwhirl,Poliwrath,Abra,Kadabra,Alakazam,Machop,Machoke,Machamp,Bellsprout,Weepinbell,Victreebel,Tentacool,Tentacruel,Geodude,Graveler,Golem,Ponyta,Rapidash,Slowpoke,Slowbro,Magnemite,Magneton,Farfetch'd,Doduo,Dodrio,Seel,Dewgong,Grimer,Muk,Shellder,Cloyster,Gastly,Haunter,Gengar,Onix,Drowzee,Hypno,Krabby,Kingler,Voltorb,Electrode,Exeggcute,Exeggutor,Cubone,Marowak,Hitmonlee,Hitmonchan,Lickitung,Koffing,Weezing,Rhyhorn,Rhydon,Chansey,Tangela,Kangaskhan,Horsea,Seadra,Goldeen,Seaking,Staryu,Starmie,Mr. Mime,Scyther,Jynx,Electabuzz,Magmar,Pinsir,Tauros,Magikarp,Gyarados,Lapras,Ditto,Eevee,Vaporeon,Jolteon,Flareon,Porygon,Omanyte,Omastar,Kabuto,Kabutops,Aerodactyl,Snorlax,Articuno,Zapdos,Moltres,Dratini,Dragonair,Dragonite,Mewtwo,Mew" },
-  { name: 'Country calling codes', hint: 'The +number you dial. Over 180 is off the board', map: {
-    'United States':1,'Canada':1,'Russia':7,'Egypt':20,'South Africa':27,'Greece':30,'Netherlands':31,'Belgium':32,'France':33,'Spain':34,'Hungary':36,'Italy':39,'Romania':40,'Switzerland':41,'Austria':43,'United Kingdom':44,'Denmark':45,'Sweden':46,'Norway':47,'Poland':48,'Germany':49,'Peru':51,'Mexico':52,'Cuba':53,'Argentina':54,'Brazil':55,'Chile':56,'Colombia':57,'Venezuela':58,'Malaysia':60,'Australia':61,'Indonesia':62,'Philippines':63,'New Zealand':64,'Singapore':65,'Thailand':66,'Japan':81,'South Korea':82,'Vietnam':84,'China':86,'Turkey':90,'India':91,'Pakistan':92,'Afghanistan':93,'Sri Lanka':94,'Myanmar':95,'Iran':98,'Morocco':212,'Algeria':213,'Tunisia':216,'Libya':218,'Ghana':233,'Nigeria':234,'Ethiopia':251,'Kenya':254,'Tanzania':255,'Uganda':256,'Zimbabwe':263,'Portugal':351,'Ireland':353,'Iceland':354,'Finland':358,'Ukraine':380,'Hong Kong':852,'Bangladesh':880,'Taiwan':886,'Lebanon':961,'Jordan':962,'Saudi Arabia':966,'United Arab Emirates':971,'Israel':972,'Qatar':974,'Nepal':977 } },
-  { name: 'US Presidents', hint: 'Which number president (first term counts)', list:
-    'George Washington,John Adams,Thomas Jefferson,James Madison,James Monroe,John Quincy Adams,Andrew Jackson,Martin Van Buren,William Henry Harrison,John Tyler,James K. Polk,Zachary Taylor,Millard Fillmore,Franklin Pierce,James Buchanan,Abraham Lincoln,Andrew Johnson,Ulysses S. Grant,Rutherford B. Hayes,James Garfield,Chester Arthur,Grover Cleveland,Benjamin Harrison,Grover Cleveland,William McKinley,Theodore Roosevelt,William Howard Taft,Woodrow Wilson,Warren Harding,Calvin Coolidge,Herbert Hoover,Franklin D. Roosevelt,Harry Truman,Dwight Eisenhower,John F. Kennedy,Lyndon B. Johnson,Richard Nixon,Gerald Ford,Jimmy Carter,Ronald Reagan,George H. W. Bush,Bill Clinton,George W. Bush,Barack Obama,Donald Trump,Joe Biden' },
-  { name: 'US States', hint: 'Order it joined the Union', list:
-    'Delaware,Pennsylvania,New Jersey,Georgia,Connecticut,Massachusetts,Maryland,South Carolina,New Hampshire,Virginia,New York,North Carolina,Rhode Island,Vermont,Kentucky,Tennessee,Ohio,Louisiana,Indiana,Mississippi,Illinois,Alabama,Maine,Missouri,Arkansas,Michigan,Florida,Texas,Iowa,Wisconsin,California,Minnesota,Oregon,Kansas,West Virginia,Nevada,Nebraska,Colorado,North Dakota,South Dakota,Montana,Washington,Idaho,Wyoming,Utah,Oklahoma,New Mexico,Arizona,Alaska,Hawaii' },
+  { title: 'Packers passing TDs', hint: 'Career passing TDs for Green Bay. Anyone who threw one counts.', src: PFR, data:
+    "Brett Favre:442|Aaron Rodgers:475|Bart Starr:152|Lynn Dickey:133|Jordan Love:102|Tobin Rote:89|Don Majkowski:56|Randy Wright:31|Arnie Herber:66|David Whitehurst:28|Cecil Isbell:61|Curly Lambeau:24|Babe Parilli:31|Irv Comp:28|John Hadl:9|Zeke Bratkowski:21|Red Dunn:31|Scott Hunter:15|Jack Jacobs:21|Don Horn:16|Bob Monnett:28|Matt Flynn:16|Verne Lewellen:8|Brett Hundley:9|Tony Canadeo:16|Jerry Tagge:3|Mike Tomczak:11|Lamar McHan:11|Bobby Thomason:11|Anthony Dilweg:8|Jug Girard:5|Malik Willis:6|Blair Kiel:5|Jim Zorn:4|Scott Tolzien:1|Johnny Blood:3|John Roach:4|Roy McKay:6|Alan Risher:3|Paul Christman:7|Lou Brock:7|Eddie Kotal:2|Pid Purdy:1|Bo Molenda:5|Craig Nall:5|Doug Pederson:3|Carlos Brown:3|Hal Van Every:4|Rich Campbell:3|Paul Hornung:5|Jack Concannon:1|Stan Heath:1|Cub Buck:1|Charlie Mathys:10|Jim Del Gaizo:2|Vince Ferragamo:1|Joe Francis:2|Tom Moore:4|George Sauer Sr.:1|Paul Fitzgibbon:3|Don Milan:1|Roger Grove:2|Joe Laws:3|Matt Hasselbeck:2|Willard Harrell:4|Elijah Pitts:1|Hank Bruder:1|Russ Saunders:1|Ty Detmer:1|Ron Widby:1|Herm Rohrig:1|Bobby Douglass:1|Mule Wilson:1|Jack McAuliffe:1|Gerry Ellis:1|Bob Forte:1|Rick Norton:1|Jack Losch:1|Andy Uram:1|Herdis McCrary:1|MacArthur Lane:1|Donny Anderson:2|Don Hutson:1|Bubba Franks:1|Tim Masthay:1|Tony Fisher:1|Ahman Green:1|Fred Provo:1|Paul Ott Carruth:1" },
+  { title: 'Summer Olympic golds', hint: 'All-time gold medals by country, through Paris 2024. Old teams like the Soviet Union count.', src: 'Wikipedia, all-time Olympic medal table', data: "United States:1106|Soviet Union:395|Great Britain:303|China:303|France:243|Italy:229|Germany:214|Japan:189|Hungary:187|Australia:180|East Germany:153|Sweden:151|Russia:147|Netherlands:111|South Korea:109|Finland:101|Romania:93|Cuba:86|Canada:79|Poland:73|Norway:63|New Zealand:63|Bulgaria:57|West Germany:56|Switzerland:53|Spain:53|Denmark:50|Czechoslovakia:49|Belgium:47|Unified Team:45|Turkey:41|Brazil:40|Kenya:39|Ukraine:38|Greece:36|United Team of Germany:28|South Africa:28|Jamaica:27|Iran:27|Yugoslavia:26|Ethiopia:24|Argentina:22|Czech Republic:22|Austria:21|ROC:20|Uzbekistan:18|North Korea:16|Croatia:16|Kazakhstan:15|Ireland:15|Belarus:13|Mexico:13|Georgia:13|Thailand:11|Indonesia:10|Slovakia:10|India:10|Slovenia:10|Estonia:10|Azerbaijan:9|Egypt:9|Chinese Taipei:9|Serbia:9|Morocco:8|Bahamas:8|Algeria:7|Portugal:6|Lithuania:6|Tunisia:6|Colombia:5|Uganda:5|Latvia:4|Israel:4|Dominican Republic:4|Ecuador:4|Hong Kong:4|Pakistan:4|Bahrain:4|Nigeria:3|Chile:3|Venezuela:3|Trinidad and Tobago:3|Philippines:3|Australasia:3|Zimbabwe:3|Cameroon:3|Kosovo:3|Mongolia:2|Armenia:2|Serbia and Montenegro:2|Puerto Rico:2|Uruguay:2|Qatar:2|Fiji:2|Russian Empire:1|Peru:1|Vietnam:1|Singapore:1|Botswana:1|Jordan:1|Tajikistan:1|Grenada:1|Ivory Coast:1|Costa Rica:1|Panama:1|Syria:1|Guatemala:1|Burundi:1|Luxembourg:1|Saint Lucia:1|Bermuda:1|Mozambique:1|Suriname:1|United Arab Emirates:1|Dominica:1" },
+  { title: 'Saints passing TDs', hint: 'Career passing TDs for New Orleans. Anyone who threw one counts.', src: PFR, data:
+    "Drew Brees:491|Archie Manning:115|Aaron Brooks:120|Bobby Hebert:85|Jim Everett:60|Billy Kilmer:47|Dave Wilson:36|Derek Carr:40|Tyler Shough:24|Steve Walsh:25|Ken Stabler:17|Billy Joe Tolliver:15|Spencer Rattler:12|Andy Dalton:18|Bobby Scott:15|Edd Hargett:11|Wade Wilson:12|Taysom Hill:12|Richard Todd:14|Jameis Winston:20|John Fourcade:14|Billy Joe Hobert:13|Jeff Blake:13|Gary Cuozzo:7|Teddy Bridgewater:10|Bobby Douglass:5|Danny Wuerffel:9|Heath Shuler:2|Kerry Collins:4|Trevor Siemian:11|Todd Bouman:3|Jake Delhomme:3|Mike Buck:4|Doug Nussmeier:1|Larry Cipa:1|Karl Sweetan:1|Jim Ninowski:1|Jake Haener:1|Guido Merkens:2|Jamie Martin:1|Ronnie Lee South:1|Dalton Hilliard:4|Russell Erxleben:1|Willie Snead:1|Chuck Muncie:1|Andy Livingston:1|Hokie Gajan:1|Jack Holmes:1|Mario Bates:1|Cedrick Wilson Jr.:1|Lamar Smith:1|Deuce McAllister:1|Tom Myers:1|Kevin Ingram:1|Tom Blanchard:1" },
+  { title: 'Country populations', hint: 'Population in millions, rounded. Places under half a million are off the board.', src: 'UN estimates for mid-2023, via Wikipedia', data: "India:1438|China:1423|United States:343|Indonesia:281|Pakistan:248|Nigeria:228|Brazil:211|Bangladesh:171|Russia:145|Mexico:130|Ethiopia:129|Japan:124|Philippines:115|Egypt:115|DR Congo:106|Vietnam:100|Iran:91|Turkey:87|Germany:85|Thailand:72|United Kingdom:69|Tanzania:67|France:66|South Africa:63|Italy:59|Kenya:55|Myanmar:54|Colombia:52|South Korea:52|Sudan:50|Uganda:49|Spain:48|Algeria:46|Argentina:46|Iraq:45|Afghanistan:41|Yemen:39|Canada:39|Poland:39|Ukraine:38|Morocco:38|Angola:37|Uzbekistan:36|Malaysia:35|Peru:34|Ghana:34|Mozambique:34|Saudi Arabia:32|Madagascar:31|Ivory Coast:31|Nepal:30|Cameroon:28|Venezuela:28|Australia:26|North Korea:26|Niger:26|Mali:24|Syria:24|Taiwan:23|Burkina Faso:23|Sri Lanka:23|Malawi:21|Zambia:21|Kazakhstan:20|Chile:20|Chad:19|Romania:19|Somalia:18|Guatemala:18|Senegal:18|Netherlands:18|Ecuador:18|Cambodia:17|Zimbabwe:16|Guinea:14|Benin:14|Rwanda:14|Burundi:14|Bolivia:12|Tunisia:12|Belgium:12|Haiti:12|South Sudan:11|Jordan:11|Dominican Republic:11|Cuba:11|Czechia:11|Honduras:11|United Arab Emirates:11|Sweden:11|Portugal:10|Tajikistan:10|Papua New Guinea:10|Azerbaijan:10|Greece:10|Hungary:10|Togo:9|Israel:9|Austria:9|Belarus:9|Switzerland:9|Sierra Leone:8|Laos:8|Hong Kong:7|Turkmenistan:7|Libya:7|Kyrgyzstan:7|Paraguay:7|Nicaragua:7|Bulgaria:7|Serbia:7|El Salvador:6|Congo:6|Denmark:6|Singapore:6|Lebanon:6|Finland:6|Norway:6|Slovakia:6|Liberia:5|Palestine:5|Ireland:5|New Zealand:5|Central African Republic:5|Costa Rica:5|Oman:5|Mauritania:5|Kuwait:5|Panama:4|Croatia:4|Georgia:4|Eritrea:3|Mongolia:3|Uruguay:3|Puerto Rico:3|Bosnia and Herzegovina:3|Moldova:3|Qatar:3|Namibia:3|Armenia:3|Lithuania:3|Jamaica:3|Albania:3|Gambia:3|Gabon:2|Botswana:2|Lesotho:2|Guinea-Bissau:2|Slovenia:2|Latvia:2|Equatorial Guinea:2|North Macedonia:2|Kosovo:2|Bahrain:2|Trinidad and Tobago:2|Timor-Leste:1|Estonia:1|Cyprus:1|Mauritius:1|Eswatini:1|Djibouti:1|Fiji:1|Réunion:1|Comoros:1|Guyana:1|Solomon Islands:1|Bhutan:1|Macao:1|Luxembourg:1|Montenegro:1|Suriname:1|Western Sahara:1|Malta:1|Maldives:1|Cape Verde:1" },
+  { title: 'Patriots passing TDs', hint: 'Career passing TDs for New England. Anyone who threw one counts.', src: PFR, data:
+    "Tom Brady:541|Drew Bledsoe:166|Steve Grogan:182|Babe Parilli:132|Tony Eason:60|Jim Plunkett:62|Drake Maye:64|Mac Jones:46|Hugh Millen:17|Matt Cassel:23|Mike Taliaferro:27|Butch Songin:36|Matt Cavanaugh:19|Cam Newton:8|Marc Wilson:9|Bailey Zappe:11|Doug Flutie:11|Tom Hodson:7|Tom Yewcic:12|Scott Zolak:8|Jacoby Brissett:2|Tom Sherman:12|Joe Kapp:3|Tom Ramsey:6|Scott Secules:2|Brian Hoyer:2|Jimmy Garoppolo:5|Tom Owen:3|Don Trull:1|Brian Dowling:2|Jarrett Stidham:2|Eddie Wilson:1|Tom Greene:1|Neil Graff:2|Joe Milton:1|Jeff Carlson:1|Andy Johnson:4|Bob Bleier:1|Julian Edelman:1|Dick Christy:2|Jakobi Meyers:2|Michael Bishop:1|David Patten:1|Dave Meggett:1|Mosi Tatupu:1|Vinny Testaverde:1|Gino Cappelletti:1|Craig James:3|Kendrick Bourne:1|Jon Vaughn:1|Adam Vinatieri:1" },
+  { title: 'Colts passing TDs', hint: 'Career passing TDs for the Colts. Baltimore and Indianapolis both count.', src: PFR, data:
+    "Peyton Manning:399|Johnny Unitas:287|Andrew Luck:171|Bert Jones:122|Jack Trudeau:41|Jeff George:41|Jim Harbaugh:49|Mike Pagel:39|Jacoby Brissett:31|Earl Morrall:47|Daniel Jones:25|Philip Rivers:28|Carson Wentz:27|Marty Domres:21|Greg Landry:17|Gardner Minshew II:15|Gary Hogeboom:22|Matt Ryan:14|George Shaw:21|Anthony Richardson:11|Chris Chandler:10|Matt Hasselbeck:11|Paul Justin:7|Bill Troup:10|Gary Kerkorian:11|Joe Flacco:12|Curtis Painter:6|Gary Cuozzo:13|Fred Enke:8|Dan Orlovsky:6|Don Majkowski:6|Art Schlichter:3|Jim Sorgi:6|Mark Herrmann:2|Craig Erickson:3|Sam Ehlinger:3|Kerry Collins:2|Kelly Holcomb:1|Blair Kiel:3|Riley Leonard:2|Brian Hoyer:4|Scott Tolzien:1|Lamar McHan:4|Matt Kofler:1|Tom Ramsey:1|Tom Matte:2|Jack Del Bello:1|George Taliaferro:2|Mike Kirkland:1|Jim Ward:2|Tom Tupa:1|Josh Freeman:1|Ed Mioduszewski:2|Ed Brown:1|Joe Washington:2|Ray Brown:1|Kerwin Bell:1|Curtis Dickey:1|Ryan Lindley:1|Cotton Speyrer:1|Ken Dilger:1|Lenny Moore:2|Joseph Addai:1|Don McCauley:1|Mike Wood:1" },
 ];
-const START = 501, MAX_DARTS = 20, BOARD_MAX = 180;
-const norm = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+// Other names people type for the same country. A|B means whichever is on today's board.
+const ALIASES = {
+  usa: 'United States', us: 'United States', america: 'United States', unitedstatesofamerica: 'United States',
+  uk: 'United Kingdom|Great Britain', britain: 'United Kingdom|Great Britain', unitedkingdom: 'Great Britain', greatbritain: 'United Kingdom',
+  ussr: 'Soviet Union', korea: 'South Korea', dprk: 'North Korea', holland: 'Netherlands', burma: 'Myanmar',
+  czechrepublic: 'Czechia', czechia: 'Czech Republic', taiwan: 'Chinese Taipei', chinesetaipei: 'Taiwan',
+  cotedivoire: 'Ivory Coast', drc: 'DR Congo', democraticrepublicofthecongo: 'DR Congo', uae: 'United Arab Emirates',
+  turkiye: 'Turkey', swaziland: 'Eswatini', easttimor: 'Timor-Leste', caboverde: 'Cape Verde', macau: 'Macao',
+  bosnia: 'Bosnia and Herzegovina', trinidad: 'Trinidad and Tobago', saudi: 'Saudi Arabia',
+};
+const START = 501, DARTS = 5;
+const SUFFIX = /\s+(jr|sr|ii|iii|iv)\.?$/i;
+const norm = s => s.trim().toLowerCase().replace(/^the\s+/, '').replace(SUFFIX, '').normalize('NFD').replace(/[^a-z0-9]/g, '');
+const lev = (a, b) => { // edit distance, for typos
+  let prev = [...Array(b.length + 1).keys()];
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] !== b[j - 1]));
+    prev = cur;
+  }
+  return prev[b.length];
+};
 
-// Daily pick. ponytail: rotates through CATS in order, add more categories to stretch the cycle.
+// ponytail: categories rotate in order from day 1; add more to CATS to stretch the cycle.
 const now = new Date();
 const today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
 const dayNum = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2026, 10, 10)) / 864e5) + 1;
 const cat = CATS[((dayNum - 1) % CATS.length + CATS.length) % CATS.length];
 
-const answers = new Map(); // norm -> [display, value]
-if (cat.map) for (const [k, v] of Object.entries(cat.map)) answers.set(norm(k), [k, v]);
-else cat.list.split(',').forEach((k, i) => { if (!answers.has(norm(k))) answers.set(norm(k), [k, i + 1]); });
+const board = cat.data.split('|').map(s => {
+  const [name, value] = s.split(':'), words = name.replace(SUFFIX, '').split(' ');
+  return { name, value: +value, key: norm(name), tails: [norm(words.at(-1)), norm(words.slice(1).join(' '))] };
+});
+
+// Exact name (or alias) returns the entry. Anything else returns close matches to suggest.
+function lookup(text) {
+  const q = norm(text);
+  if (!q) return [];
+  const hit = board.find(e => e.key === q) || (ALIASES[q] || '').split('|').map(n => board.find(e => e.name === n)).find(Boolean);
+  if (hit) return hit;
+  const close = t => t === q || (q.length >= 4 && lev(t, q) <= (q.length >= 6 ? 2 : 1));
+  return board.filter(e => [e.key, ...e.tails].some(t => t && close(t)));
+}
 
 const $ = id => document.getElementById(id);
-$('day').textContent = `Day #${dayNum}`;
-$('cat').innerHTML = `${cat.name}<small>${cat.hint}</small>`;
-$('answers').innerHTML = [...answers.values()].map(([k]) => `<option value="${k}">`).join('');
+$('day').textContent = `Day ${dayNum}`;
+$('cat').textContent = cat.title;
+$('hint').textContent = cat.hint;
+$('src').textContent = 'Source: ' + cat.src;
 
-let state = { day: today, throws: [] }; // throws: [name, value, kind]
-try { const s = JSON.parse(localStorage.getItem('501')); if (s && s.day === today) state = s; } catch {}
+let state = { day: today, cat: cat.title, throws: [] }; // throws: [name, value, bust]
+try { const s = JSON.parse(localStorage.getItem('501')); if (s && s.day === today && s.cat === cat.title) state = s; } catch {}
 const save = () => { try { localStorage.setItem('501', JSON.stringify(state)); } catch {} };
 
-const scoreLeft = () => state.throws.reduce((s, [, v, k]) => k === 'hit' ? s - v : s, START);
-const done = () => scoreLeft() === 0 || state.throws.length >= MAX_DARTS;
+const left = () => state.throws.reduce((s, [, v, bust]) => bust ? s : s - v, START);
+const over = () => left() === 0 || state.throws.length >= DARTS;
 
 function render() {
-  $('score').textContent = scoreLeft();
-  $('darts').textContent = `${state.throws.length}/${MAX_DARTS}`;
-  $('log').innerHTML = state.throws.map(([n, v, k], i) =>
-    `<li><span>${i + 1}. ${n} <span class="miss">(${v})</span></span><span class="${k}">${
-      k === 'hit' ? '−' + v : k === 'bust' ? 'BUST' : 'OFF BOARD'}</span></li>`).reverse().join('') || '<li class="miss">No darts yet.</li>';
-  const end = $('end');
-  end.hidden = !done();
-  $('throw').hidden = done();
-  if (done()) {
-    const won = scoreLeft() === 0;
-    end.className = 'card ' + (won ? 'win' : 'lose');
-    $('endTitle').textContent = won ? 'Checked out' : 'Out of darts';
-    $('endText').textContent = won ? `${state.throws.length} darts. Come back tomorrow for a new board.`
-                                   : `${scoreLeft()} left on the board. Come back tomorrow.`;
-  }
+  $('score').textContent = left();
+  $('darts').textContent = DARTS - state.throws.length;
+  $('log').innerHTML = state.throws.map(([n, v, bust], i) =>
+    `<li><span>${i + 1}. ${n}</span><span class="${bust ? 'bust' : 'hit'}">${bust ? v + ', BUST' : '−' + v}</span></li>`).join('')
+    || '<li class="muted">No darts thrown yet.</li>';
+  $('throw').hidden = $('end').hidden = false;
+  if (!over()) return void ($('end').hidden = true);
+  $('throw').hidden = true;
+  const perfect = left() === 0, mine = state.throws.map(t => t[0]);
+  $('end').className = 'card' + (perfect ? ' win' : '');
+  $('endTitle').textContent = perfect ? 'Perfect game' : `Score: ${left()}`;
+  $('endText').textContent = perfect ? `You hit 0 in ${state.throws.length} darts.` : 'Lowest score wins. Send it and see who got closer.';
+  $('all').innerHTML = [...board].sort((a, b) => b.value - a.value)
+    .map(e => `<li class="${mine.includes(e.name) ? 'mine' : ''}"><span>${e.name}</span><span>${e.value}</span></li>`).join('');
 }
 
 $('throw').addEventListener('submit', e => {
   e.preventDefault();
-  if (done()) return;
-  const hit = answers.get(norm($('guess').value));
-  const msg = $('msg');
-  if (!hit) { msg.textContent = "That's not on today's list."; return; }
-  const [name, value] = hit;
-  if (state.throws.some(([n]) => n === name)) { msg.textContent = `Already used ${name}.`; return; }
-  const kind = value > BOARD_MAX ? 'miss' : value > scoreLeft() ? 'bust' : 'hit';
-  state.throws.push([name, value, kind]);
-  msg.textContent = kind === 'hit' ? `${name}: ${value}` : kind === 'bust' ? `${name} is ${value}. Bust.` : `${name} is ${value}. Off the board.`;
+  if (over()) return;
+  const r = lookup($('guess').value), msg = $('msg');
+  if (Array.isArray(r)) { // free: typos and misses don't cost a dart
+    if (r.length === 1) $('guess').value = r[0].name;
+    msg.textContent = !r.length ? "No match on today's board. Try the full name or check the spelling."
+      : r.length === 1 ? `Did you mean ${r[0].name}? Hit Throw again.`
+      : `Did you mean ${r.slice(0, 3).map(e => e.name).join(', ')}? Type the full name.`;
+    return;
+  }
+  if (state.throws.some(([n]) => n === r.name)) { msg.textContent = `You already threw ${r.name}.`; return; }
+  const bust = r.value > left();
+  state.throws.push([r.name, r.value, bust]);
+  msg.textContent = `${r.name}: ${r.value}.` + (bust ? ' Bust.' : '');
   $('guess').value = '';
   save(); render();
 });
 
-$('share').addEventListener('click', () => {
-  const won = scoreLeft() === 0;
-  const line = state.throws.map(([, v, k]) => k === 'hit' ? v : k === 'bust' ? 'X' : '0').join(' ');
-  const text = `501 Daily #${dayNum} · ${cat.name}\n${won ? `Checked out in ${state.throws.length} darts` : `${scoreLeft()} left`}\n${line}\n${location.href}`;
-  navigator.clipboard.writeText(text).then(() => $('share').textContent = 'Copied', () => alert(text));
+$('share').addEventListener('click', async () => {
+  const text = `501 Daily, day ${dayNum}: ${cat.title}\nScore: ${left()}` +
+    (left() === 0 ? ` in ${state.throws.length} darts` : '') + `\n${location.origin}${location.pathname}`;
+  try {
+    if (navigator.share) await navigator.share({ text });
+    else { await navigator.clipboard.writeText(text); $('share').textContent = 'Copied'; }
+  } catch (err) { if (err.name !== 'AbortError') prompt('Copy your score:', text); }
 });
 
 render();
