@@ -143,13 +143,11 @@ handleAnswerSubmit = event => {
 
 const renderPlaytest = render;
 render = () => {
+  if (stage === 'finished') {renderFinalScore(); return;}
   renderPlaytest();
   if (stage === 'question') {
     const input = document.getElementById('answer');
     if (!document.getElementById('answerOptions')) attachAnswerOptions(input);
-  } else if (stage === 'finished') {
-    const summary = el.querySelector('.final-card');
-    if (summary && !summary.querySelector('.score-chart')) summary.insertAdjacentHTML('beforeend', roundProgressChart(history));
   } else if (stage === 'result') {
     const card = el.querySelector('.feedback-good, .feedback-bad');
     const result = history[round];
@@ -173,8 +171,62 @@ function scoreColumns(title, columns, maximum) {
 
 function roundProgressChart(rounds) {
   let total = 0;
-  const columns = rounds.map((result, i) => ({label:'R' + (i + 1), value:total += result.earned}));
-  return scoreColumns('Your score by round', columns, 360);
+  const totals = [0, ...rounds.map(result => total += result.earned)];
+  const points = totals.map((value, i) => [36 + i * 78, 164 - value * .38]);
+  const trace = points.map(([x,y], i) => (i ? 'L' : 'M') + x + ' ' + y).join(' ');
+  const [lastX,lastY] = points[points.length - 1];
+  let guides = '';
+  for (const value of [0,120,240,360]) {
+    const y = 164 - value * .38;
+    guides += '<path class="finish-guide" d="M36 ' + y + 'H660"/><text x="29" y="' + (y + 3) + '" text-anchor="end">' + value + '</text>';
+  }
+  const labels = points.map(([x], i) => i ? '<text x="' + x + '" y="188" text-anchor="middle">' + i + '</text>' : '').join('');
+  return '<figure class="finish-graph"><figcaption>Your score by round</figcaption>' +
+    '<svg viewBox="0 0 680 200" role="img" aria-label="Cumulative points by round: ' + totals.slice(1).join(', ') + '">' +
+    guides + '<path class="finish-trace-fill" d="' + trace + ' L' + lastX + ' 164 H36 Z"/>' +
+    '<path class="finish-trace" d="' + trace + '"/>' +
+    '<circle class="finish-trace-point" cx="' + lastX + '" cy="' + lastY + '" r="5"/>' + labels + '</svg></figure>';
+}
+
+function roundReview() {
+  return history.map((result, i) => {
+    const item = questions[i];
+    const guess = result.answer ? escapeHTML(result.answer) : 'No answer';
+    const points = result.earned + '/' + result.wager + ' pts';
+    return '<li class="finish-round ' + (result.correct ? 'round-hit' : '') + '">' +
+      '<div class="finish-round-meta"><span>Round ' + (i + 1) + ' · ' + escapeHTML(item.sport) + ' · ' +
+      escapeHTML(item.cat) + '</span><strong>' + points + '</strong></div>' +
+      '<h3>' + escapeHTML(item.q) + '</h3><dl><div><dt>Your guess</dt><dd>' + guess +
+      '</dd></div><div><dt>Correct answer</dt><dd>' + escapeHTML(item.a[0]) + '</dd></div></dl></li>';
+  }).join('');
+}
+
+function renderFinalScore() {
+  clearInterval(clock);
+  clearInterval(countdownInterval);
+  document.body.classList.toggle('finished-screen', true);
+  document.body.classList.toggle('home-screen', false);
+  const daily = mode === 'daily';
+  const correct = history.filter(result => result.correct).length;
+  const hasComparison = daily && config.sharedScores && globalStatus === 'ready' &&
+    globalStats?.bands?.some(count => Number(count) > 0);
+  const graph = hasComparison ? resultsExtras() : roundProgressChart(history);
+  const status = daily && !hasComparison ? resultsExtras() : '';
+  const actions = daily
+    ? '<button class="button" onclick="shareResults()">Share results</button>' +
+      '<button class="button mode-secondary" onclick="openTrophies()">Trophy Room</button>'
+    : '<button class="button" onclick="start(&quot;unlimited&quot;,true)">Play again</button>' +
+      '<button class="button mode-secondary" onclick="goHome()">Back to modes</button>';
+
+  el.innerHTML = '<div class="finish-board" aria-label="Game results" role="region"><section class="finish-hero">' +
+    '<p class="finish-kicker">' + (daily ? 'Daily Challenge #' + DAY_NUMBER : 'Unlimited') + '</p>' +
+    '<h2>Final score</h2><div class="finish-score"><strong>' + score + '</strong><span>/ 360</span></div>' +
+    '<div class="finish-summary">' + tierHTML(score) + '<span>' + correct + ' of ' + questions.length + ' correct</span></div>' +
+    graph + status + '<div class="finish-actions">' + actions + '</div>' +
+    (daily ? '<p class="note" id="sharestatus" role="status"></p>' : '') +
+    '</section><section class="finish-review"><h2>Round review</h2><ol>' + roundReview() + '</ol></section>' +
+    (daily ? '<div class="finish-next">' + countdownHTML() + '</div>' : '') + '</div>';
+  if (daily) startCountdown();
 }
 
 resultsExtras = () => {
