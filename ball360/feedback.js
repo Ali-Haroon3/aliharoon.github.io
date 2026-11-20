@@ -14,7 +14,8 @@ for (const item of Object.values(QUESTION_BY_ID)) {
 function answerMatches(input, sport) {
   const typed = norm(input);
   const terms = answerTerms[sport];
-  if (!typed || !terms) return [];
+  // Numeric answers are graded normally, but never offered as hints.
+  if (!/[a-z]/.test(typed) || !terms) return [];
   if (typed.length < 3 || /\d/.test(typed)) return terms.has(typed) ? [terms.get(typed)] : [];
   const words = typed.split(' ');
   const tolerance = typed.length >= 6 ? 2 : typed.length >= 4 ? 1 : 0;
@@ -151,7 +152,11 @@ render = () => {
   } else if (stage === 'result') {
     const card = el.querySelector('.feedback-good, .feedback-bad');
     const result = history[round];
-    if (result.answer && card && !card.querySelector('.arena-replay')) showArenaReplay(card, questions[round].sport, result, score);
+    if (card && !card.querySelector('.round-answers')) {
+      const item = questions[round];
+      card.innerHTML = answerRecap(result, item);
+      if (result.answer) showArenaReplay(card, item.sport, result, score);
+    }
   }
 };
 const initializePlaytest = initializeGame;
@@ -188,16 +193,20 @@ function roundProgressChart(rounds) {
     '<circle class="finish-trace-point" cx="' + lastX + '" cy="' + lastY + '" r="5"/>' + labels + '</svg></figure>';
 }
 
+function answerRecap(result, item) {
+  const guess = result.answer ? escapeHTML(result.answer) : 'No answer';
+  return '<dl class="round-answers"><div><dt>Your answer</dt><dd>' + guess +
+    '</dd></div><div><dt>Correct answer</dt><dd>' + escapeHTML(item.a[0]) + '</dd></div></dl>';
+}
+
 function roundReview() {
   return history.map((result, i) => {
     const item = questions[i];
-    const guess = result.answer ? escapeHTML(result.answer) : 'No answer';
     const points = result.earned + '/' + result.wager + ' pts';
     return '<li class="finish-round ' + (result.correct ? 'round-hit' : '') + '">' +
       '<div class="finish-round-meta"><span>Round ' + (i + 1) + ' · ' + escapeHTML(item.sport) + ' · ' +
       escapeHTML(item.cat) + '</span><strong>' + points + '</strong></div>' +
-      '<h3>' + escapeHTML(item.q) + '</h3><dl><div><dt>Your guess</dt><dd>' + guess +
-      '</dd></div><div><dt>Correct answer</dt><dd>' + escapeHTML(item.a[0]) + '</dd></div></dl></li>';
+      '<h3>' + escapeHTML(item.q) + '</h3>' + answerRecap(result, item) + '</li>';
   }).join('');
 }
 

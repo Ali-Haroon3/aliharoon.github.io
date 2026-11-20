@@ -9,14 +9,15 @@ function showArenaReplay(card, sport, result, runScore) {
   canvas.height = 500;
   const call = document.createElement('p');
   call.className = 'arena-call';
-  call.textContent = result.correct ? (sport === 'NFL' ? 'IT’S GOOD!' : 'SWISH!') : 'NO GOOD';
+  call.textContent = sport === 'NFL' ? 'IT’S GOOD!' : 'SWISH!';
   const scoreboard = document.createElement('div');
   scoreboard.className = 'arena-scoreboard';
   const league = document.createElement('span');
   league.textContent = sport + ' · ' + result.wager + ' PT WAGER';
   const total = document.createElement('strong');
   scoreboard.append(league, total);
-  replay.append(canvas, scoreboard, call);
+  replay.append(canvas, scoreboard);
+  if (result.correct) replay.append(call);
   card.prepend(replay);
   let ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -237,8 +238,8 @@ function showArenaReplay(card, sport, result, runScore) {
       total.textContent = shown + ' / 360';
       displayedScore = shown;
     }
-    if (reveal && !call.classList.contains('resolved')) {
-      call.textContent += earned ? '  ·  +' + earned + ' PTS' : '  ·  +0 PTS';
+    if (reveal && made && !call.classList.contains('resolved')) {
+      call.textContent += '  ·  +' + earned + ' PTS';
       call.classList.add('resolved');
     }
 
