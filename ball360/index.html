@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ball360 is a daily NBA and NFL trivia game. Eight questions, eight wagers, 360 points.">
+  <meta name="theme-color" content="#111111">
+  <title>Ball360 | Daily NBA &amp; NFL Trivia</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="court.css">
+  <script defer src="config.js"></script>
+  <script defer src="game.js"></script>
+  <script defer src="trophies.js"></script>
+</head>
+<body class="home-screen">
+  <header>
+    <a class="logo" href="./index.html" onclick="event.preventDefault(); goHome()" aria-label="Ball360 home"><img src="logo.png" alt=""><span class="wordmark">BALL<b>360.</b></span></a>
+    <nav aria-label="Game">
+      <button id="recordsToggle" type="button" class="nav-button" onclick="openRecords()">Stats</button>
+      <button id="trophyNav" type="button" class="nav-button" onclick="openTrophies()">Trophy Room<span id="rewardDot" hidden aria-label=" — spin available"></span></button>
+    </nav>
+  </header>
+  <main>
+    <section class="intro">
+      <p class="edition">Daily challenge <span id="daylabel"></span></p>
+      <h1>PROVE YOU KNOW <em>BALL.</em></h1>
+      <p class="subtitle">NBA &amp; NFL trivia</p>
+      <div class="quick-stats">
+        <div><strong>8</strong><small>Questions</small></div>
+        <div><strong>30s</strong><small>Per question</small></div>
+        <div><strong>360</strong><small>Max points</small></div>
+      </div>
+    </section>
+    <div class="layout"><section class="panel"><div id="game" aria-busy="true">Loading challenge…</div></section></div>
+    <section class="rules" aria-labelledby="rules-title">
+      <h2 id="rules-title">How to play</h2>
+      <ol>
+        <li>See the category, then wager 10–80 points. Use each wager once.</li>
+        <li>Type your answer in 30 seconds. A correct answer earns your wager.</li>
+        <li>Finish the Daily Challenge to earn a Trophy Room spin. Play Unlimited for extra rounds.</li>
+      </ol>
+    </section>
+    <footer class="footer">© 2026 Ball360 · Created by <a href="https://www.instagram.com/joshlatrat_/" rel="noopener noreferrer">@joshlatrat</a></footer>
+  </main>
+  <dialog id="recordsDialog" aria-labelledby="recordsTitle">
+    <form method="dialog"><button class="close-dialog" aria-label="Close stats">×</button></form>
+    <h2 id="recordsTitle">My stats</h2>
+    <div id="recordsContent"></div>
+  </dialog>
+  <dialog id="trophyDialog" aria-labelledby="trophyTitle">
+    <form method="dialog"><button class="close-dialog" aria-label="Close Trophy Room">×</button></form>
+    <div id="trophyContent"></div>
+  </dialog>
+</body>
+</html>
