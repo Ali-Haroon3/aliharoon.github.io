@@ -1,51 +1,60 @@
 'use strict';
 
-// The dictionary is built from the whole bank. A suggestion has no knowledge of
-// which answer is correct for the current question.
-const spellingDictionary = new Map();
-function addSpelling(label) {
-  const key = norm(label);
-  if (key.length >= 5 && !/\d/.test(key) && !spellingDictionary.has(key)) {
-    spellingDictionary.set(key, label);
-  }
-}
+// All matches come from the bank for the current sport, independent of the prompt.
+const answerTerms = {NBA: new Map(), NFL: new Map()};
 for (const item of Object.values(QUESTION_BY_ID)) {
-  item.a.forEach(addSpelling);
-  expandAcceptedAnswers(item.a).forEach(alias =>
-    addSpelling(alias.replace(/\b[a-z]/g, letter => letter.toUpperCase())));
-}
-
-function spellingSuggestion(input) {
-  const typed = norm(input);
-  if (typed.length < 5 || /\d/.test(typed) || spellingDictionary.has(typed)) return null;
-  let bestDistance = typed.length >= 9 ? 2 : 1;
-  let bestLabel = null;
-  let tied = false;
-  for (const [candidate, label] of spellingDictionary) {
-    if (Math.abs(typed.length - candidate.length) > bestDistance) continue;
-    const difference = distance(typed, candidate);
-    if (difference > bestDistance) continue;
-    if (difference === bestDistance && bestLabel !== null) {
-      tied = true;
-      continue;
-    }
-    bestDistance = difference;
-    bestLabel = label;
-    tied = false;
+  const dictionary = answerTerms[item.sport];
+  const labels = new Map(item.a.map(label => [norm(label), label]));
+  for (const alias of expandAcceptedAnswers(item.a)) {
+    if (alias) dictionary.set(alias, labels.get(alias) ||
+      dictionary.get(alias) || alias.replace(/\b[a-z]/g, letter => letter.toUpperCase()));
   }
-  return tied ? null : bestLabel;
 }
 
-function hideSpelling() {
-  const review = document.getElementById('spellingReview');
-  if (review) review.hidden = true;
+function bestMatch(input, sport) {
+  const typed = norm(input);
+  const terms = answerTerms[sport];
+  if (!typed || !terms) return null;
+  if (terms.has(typed)) return terms.get(typed);
+  if (typed.length < 3 || /\d/.test(typed)) return null;
+  const words = typed.split(' ');
+  const tolerance = typed.length >= 6 ? 2 : typed.length >= 4 ? 1 : 0;
+  let best = null;
+  let bestRank = Infinity;
+  for (const [key, label] of terms) {
+    const parts = key.split(' ');
+    let rank = Infinity;
+    if (words.every(word => parts.some(part => part.startsWith(word)))) rank = 1;
+    else if (parts.some(part => part.includes(typed))) rank = 2;
+    else if (key.startsWith(typed)) rank = 3.5;
+
+    if (rank > 2 && bestRank > 2 && tolerance) {
+      for (const [index, part] of [...parts, key].entries()) {
+        if (part[0] !== typed[0] || Math.min(part.length, typed.length) < 3) continue;
+        const edits = distance(typed, part.slice(0, typed.length));
+        if (edits <= tolerance) rank = Math.min(rank, edits + (index === parts.length - 1 ? 2 : 3));
+      }
+    }
+    if (rank < bestRank || (rank === bestRank && best && label.length < best.length)) {
+      best = label;
+      bestRank = rank;
+    }
+  }
+  return best;
 }
-function shotMarkup(sport, result) {
-  if (!result.answer) return '';
-  const goal = sport === 'NFL' ? 'uprights' : 'basket';
-  const outcome = result.correct ? 'made' : 'missed';
-  return '<div aria-hidden="true" class="shot ' + goal + ' ' + outcome + '"><span class="shot-line"></span>' +
-    '<span class="shot-target"></span><span class="shot-ball"></span></div>';
+
+function currentMatch() {
+  const item = questions[round];
+  const typed = answerDraft.trim();
+  // A valid custom alias or exact answer should always win over suggestions.
+  return isCorrect(typed, item.a) ? typed : bestMatch(typed, item.sport);
+}
+
+function showBestMatch() {
+  const match = currentMatch();
+  const preview = document.getElementById('bestMatch');
+  if (!preview) return;
+  preview.textContent = match && norm(match) !== norm(answerDraft) ? 'Best match: ' + match : '';
 }
 
 function openRules() {
@@ -73,40 +82,27 @@ handleAnswerSubmit = event => {
   event.preventDefault();
   if (Date.now() >= questionDeadline) { submit(true); return; }
   if (!answerDraft.trim()) return;
-  const suggestion = isCorrect(answerDraft, questions[round].a) ? null : spellingSuggestion(answerDraft);
-  if (!suggestion) { submit(false); return; }
-  const review = document.getElementById('spellingReview');
-  review.hidden = false;
-  review.querySelector('strong').textContent = suggestion;
-  const accept = document.getElementById('useSpelling');
-  accept.onclick = () => {
-    if (Date.now() < questionDeadline) answerDraft = suggestion;
-    submit(Date.now() >= questionDeadline);
-  };
-  accept.focus();
+  answerDraft = currentMatch() || answerDraft;
+  submit(false);
 };
+
 const renderPlaytest = render;
 render = () => {
   renderPlaytest();
   if (stage === 'question') {
     const input = document.getElementById('answer');
+    if (document.getElementById('bestMatch')) return;
     input.setAttribute('autocorrect', 'off');
     input.setAttribute('autocapitalize', 'none');
+    input.setAttribute('aria-describedby', 'bestMatch');
     input.spellcheck = false;
-    input.addEventListener('input', hideSpelling);
-    document.getElementById('answerform').insertAdjacentHTML('afterend',
-      '<section class="spelling-review" id="spellingReview" hidden aria-label="Spelling suggestion">' +
-      '<p>Did you mean <strong></strong>?</p><div class="spelling-actions">' +
-      '<button type="button" class="button" id="useSpelling">Use suggestion</button>' +
-      '<button type="button" class="button mode-secondary" id="keepSpelling">Submit as typed</button>' +
-      '<button type="button" class="nav-button" id="editSpelling">Edit answer</button></div></section>');
-    document.getElementById('keepSpelling').onclick = () => submit(Date.now() >= questionDeadline);
-    document.getElementById('editSpelling').onclick = () => {hideSpelling(); input.focus();};
+    input.insertAdjacentHTML('afterend', '<p id="bestMatch" class="best-match" aria-live="polite"></p>');
+    input.addEventListener('input', showBestMatch);
+    showBestMatch();
   } else if (stage === 'result') {
     const card = el.querySelector('.feedback-good, .feedback-bad');
-    if (card && !card.querySelector('.shot')) {
-      card.insertAdjacentHTML('afterbegin', shotMarkup(questions[round].sport, history[round]));
-    }
+    const result = history[round];
+    if (result.answer && card && !card.querySelector('.arena-replay')) showArenaReplay(card, questions[round].sport, result);
   }
 };
 const initializePlaytest = initializeGame;
