@@ -8,3 +8,31 @@
 @keyframes arena-call { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 @media (max-width:440px) { header .logo .wordmark { display:none; } }
 @media (prefers-reduced-motion:reduce) { .arena-call { animation:none; } }
+
+.answer-options {
+  margin:-8px 0 10px;
+  padding:4px;
+  list-style:none;
+  border:1px solid #58363a;
+  background:#171316;
+  max-height:225px;
+  overflow:auto;
+}
+.answer-options li { padding:8px 10px; color:#f4eaeb; cursor:pointer; }
+.answer-options li:hover,.answer-options [aria-selected="true"] { background:#54242c; }
+.score-chart { margin:16px 0 12px; }
+.score-chart figcaption { font-weight:750; margin-bottom:12px; }
+.score-chart ol { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:5px; padding:0; margin:0; list-style:none; }
+.score-chart li { min-width:0; display:grid; grid-template-rows:18px 94px minmax(26px,auto); text-align:center; align-items:end; }
+.score-chart strong { font-size:.78rem; color:#fff4f2; }
+.score-chart small { align-self:start; padding-top:5px; font-size:clamp(.51rem,1.4vw,.69rem); color:#e2d2d4; }
+.score-column { position:relative; display:block; height:100%; background:#242024; border-bottom:1px solid #784852; }
+.score-column::after { content:""; position:absolute; inset:auto 0 0; height:var(--fill); background:#b63848; }
+.your-score-band .score-column::after { background:#ff5b71; }
+.band-you { display:block; font-weight:700; color:#ff99a4; }
+.arena-replay { background:#21131c; border-color:#6d3540; }
+.arena-scoreboard { position:absolute; top:0; inset-inline:0; display:flex; justify-content:space-between; align-items:center; gap:6px; padding:7px 12px; background:#211019df; border-bottom:1px solid #85414d; color:#ffc8ce; font-size:clamp(9px,1.7vw,13px); font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:.04em; }
+.arena-scoreboard strong { color:#fff6f5; }
+.arena-call { opacity:0; animation:none; bottom:8%; letter-spacing:.06em; }
+.arena-call.resolved { opacity:1; animation:arena-call .3s both; }
+@media (prefers-reduced-motion:reduce) { .arena-call.resolved { animation:none; } }
